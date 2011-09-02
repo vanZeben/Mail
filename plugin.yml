@@ -1,0 +1,8 @@
+name: Mail
+main: com.imdeity.mail.Mail
+version: 0.1
+author: vanZeben
+commands:
+  mail:
+    aliases: [m]
+    

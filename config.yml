@@ -1,0 +1,10 @@
+mysql:
+    server:
+        address: localhost
+        port: 8889
+        username: root
+        password: root
+
+    database:
+        name: kingdoms
+        table_prefix: mail_
