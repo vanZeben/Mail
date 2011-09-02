@@ -73,7 +73,6 @@ public class MailSQL {
 
         HashMap<Integer, ArrayList<String>> result = Mail.database.Read(sql);
 
-        System.out.println(Mail.mailCache);
         if (result.isEmpty()) {
             ChatTools.formatAndSend("<option><gray>Nothing in your inbox.", "Mail",
                     player);
@@ -127,7 +126,8 @@ public class MailSQL {
      
         int index = getCacheIndex(player.getName(), id);
         if (index == -1)
-            player.sendMessage("doesnt work");
+            ChatTools.formatAndSend("<option><gray>That mail doesn't exist.",
+                    "Mail", player);
         else {
             MailObject tmpMail = getMail(player, id);
             Mail.mailCache.remove(index);

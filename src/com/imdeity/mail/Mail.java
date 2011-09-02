@@ -33,7 +33,7 @@ public class Mail extends JavaPlugin {
         
         getCommand("mail").setExecutor(new MailCommand(this));
         getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN,
-                new MailPlayerListener(this), Event.Priority.Normal, this);
+                new MailPlayerListener(this), Event.Priority.High, this);
         
         database = new MySQLConnection();
         database.createDatabaseTables();

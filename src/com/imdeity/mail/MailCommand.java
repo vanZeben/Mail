@@ -48,7 +48,7 @@ public class MailCommand implements CommandExecutor {
                 || split[0].equalsIgnoreCase("?")) {
             for (String o : output)
                 player.sendMessage(o);
-        } else if(split.length < 2) {
+        } else if (split.length < 2) {
             help(player);
         } else if (split[0].equalsIgnoreCase("read")
                 || split[0].equalsIgnoreCase("r")) {
@@ -64,7 +64,9 @@ public class MailCommand implements CommandExecutor {
     }
 
     private void checkMail(Player player) {
-        MailSQL.getAllMail(player);
+        if (Mail.permissions.has(player, "mail.read")) {
+            MailSQL.getAllMail(player);
+        }
     }
 
     private void readCommand(Player player, String[] split) {
@@ -75,7 +77,7 @@ public class MailCommand implements CommandExecutor {
             } catch (NumberFormatException ex) {
                 help(player);
             }
-           MailSQL.getSpecificMail(player, id);
+            MailSQL.getSpecificMail(player, id);
         } else {
             warn(player, "You dont have permission to perform this action.");
         }
@@ -100,13 +102,15 @@ public class MailCommand implements CommandExecutor {
             String sender = player.getName();
             String receiver = split[0];
             String message = "";
-            for (int i = 1; i <= split.length-1;i++) {
-                if (i == 1) 
+            for (int i = 1; i <= split.length - 1; i++) {
+                if (i == 1)
                     message += split[i];
                 else
                     message += " " + split[i];
             }
-            ChatTools.formatAndSend("<option><green>Your message has been sent.", "Mail", player);
+            ChatTools.formatAndSend(
+                    "<option><green>Your message has been sent.", "Mail",
+                    player);
             MailSQL.sendMail(sender, receiver, message);
             plugin.notifyReceiver(receiver);
         } else {
@@ -115,9 +119,11 @@ public class MailCommand implements CommandExecutor {
     }
 
     private void help(Player player) {
-        ChatTools.formatAndSend("<option><yellow>Invalid Syntax, use \"/mail ?\" for help.", "Mail", player);
+        ChatTools.formatAndSend(
+                "<option><yellow>Invalid Syntax, use \"/mail ?\" for help.",
+                "Mail", player);
     }
-    
+
     private void warn(Player player, String msg) {
         ChatTools.formatAndSend("<option><red>" + msg, "Mail", player);
     }
