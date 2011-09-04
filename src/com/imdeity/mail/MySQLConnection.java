@@ -179,7 +179,7 @@ public class MySQLConnection {
     }
 
     // read query
-    public HashMap<Integer, ArrayList<String>> Read(String sql) {
+    public HashMap<Integer, ArrayList<String>> Read(String sql, Object... params) {
 
         /*
          * Double check connection to MySQL
@@ -197,7 +197,7 @@ public class MySQLConnection {
         HashMap<Integer, ArrayList<String>> Rows = new HashMap<Integer, ArrayList<String>>();
 
         try {
-            stmt = this.conn.prepareStatement(sql);
+            stmt = prepareSqlStatement(sql, params);
             if (stmt.executeQuery() != null) {
                 stmt.executeQuery();
                 rs = stmt.getResultSet();

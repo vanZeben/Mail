@@ -26,14 +26,13 @@ public class MailSQL {
     }
 
     public static int getIndex(String playerName, String message) {
-        int index = 0;
         String sql = "SELECT `id` FROM " + Mail.database.tableName("mail")
-                + " WHERE `receiver` = '" + playerName + "' AND `message` = '"
-                + message + "';";
+                + " WHERE `receiver` = '" + playerName + "' AND `message` = ?;";
 
-        HashMap<Integer, ArrayList<String>> result = Mail.database.Read(sql);
+        HashMap<Integer, ArrayList<String>> result = Mail.database.Read(sql,
+                message);
 
-        index = Integer.parseInt(result.get(1).get(0));
+        int index = Integer.parseInt(result.get(1).get(0));
 
         return index;
 
@@ -58,8 +57,9 @@ public class MailSQL {
                 + "`sender`, `receiver`, `message`" + ") values (?,?,?);";
 
         Mail.database.Write(sql, sender, receiver, message);
-        MailObject mail = new MailObject((getUnreadCount(receiver)), getIndex(
-                receiver, message), sender, receiver, message);
+        int index = getIndex(receiver, message);
+        MailObject mail = new MailObject((getUnreadCount(receiver)), index,
+                sender, receiver, message);
         Mail.mailCache.add(mail);
 
         return true;
@@ -74,8 +74,8 @@ public class MailSQL {
         HashMap<Integer, ArrayList<String>> result = Mail.database.Read(sql);
 
         if (result.isEmpty()) {
-            ChatTools.formatAndSend("<option><gray>Nothing in your inbox.", "Mail",
-                    player);
+            ChatTools.formatAndSend("<option><gray>Nothing in your inbox.",
+                    "Mail", player);
             ChatTools.formatAndSend(
                     "<option><yellow>Use \"/mail ?\" for command help.",
                     "Mail", player);
@@ -92,20 +92,20 @@ public class MailSQL {
                 if (getCacheIndex(receiver, i) == -1) {
                     Mail.mailCache.add(mail);
                 }
-                
-                ChatTools.formatAndSend("<option>" + getMail(player, i).toShortString(),
-                        "Mail", player);
+
+                ChatTools.formatAndSend("<option>"
+                        + getMail(player, i).toShortString(), "Mail", player);
             }
         }
-       
 
     }
 
     public static void getSpecificMail(Player player, int id) {
         MailObject tmpMail = getMail(player, id);
         if (tmpMail == null) {
-            ChatTools.formatAndSend("<option><gray>That message doesn't exist.",
-                    "Mail", player);
+            ChatTools
+                    .formatAndSend("<option><gray>That message doesn't exist.",
+                            "Mail", player);
         } else {
             ChatTools.formatAndSend("<option>" + tmpMail.toLongString(),
                     "Mail", player);
@@ -126,20 +126,25 @@ public class MailSQL {
     }
 
     public static void setClosedMail(Player player, int id) {
-     
+
         int index = getCacheIndex(player.getName(), id);
         if (index == -1)
-            ChatTools.formatAndSend("<option><gray>That message doesn't exist.",
-                    "Mail", player);
+            ChatTools
+                    .formatAndSend("<option><gray>That message doesn't exist.",
+                            "Mail", player);
         else {
             MailObject tmpMail = getMail(player, id);
             Mail.mailCache.remove(index);
-            index = getIndex(player.getName(), tmpMail.getMessage());
-            String sql = "UPDATE " + Mail.database.tableName("mail")
-                    + " SET `read` = '1' WHERE id=" + index + ";";
 
-            Mail.database.Write(sql);   
-            ChatTools.formatAndSend("<option>Successfully deleted that message.", "Mail", player);
+            index = getIndex(player.getName(), tmpMail.getMessage());
+
+            String sql = "UPDATE " + Mail.database.tableName("mail")
+                    + " SET `read` = '1' WHERE id = '" + index + "';";
+            Mail.database.Write(sql);
+
+            ChatTools.formatAndSend(
+                    "<option>Successfully deleted that message.", "Mail",
+                    player);
         }
 
     }
