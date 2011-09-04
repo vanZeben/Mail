@@ -16,7 +16,7 @@ public class MailCommand implements CommandExecutor {
     static {
         output.add(ChatTools.formatTitle("Mail"));
         output.add(ChatTools.formatCommand("", "/mail", "", "Checks Inbox."));
-        output.add(ChatTools.formatCommand("", "/mail", "[player] [message]",
+        output.add(ChatTools.formatCommand("", "/mail write", "[player] [message]",
                 "Sends a message to the specified person."));
         output.add(ChatTools.formatCommand("", "/mail", "read [num]",
                 "Opens up the specified message."));
@@ -48,15 +48,16 @@ public class MailCommand implements CommandExecutor {
                 || split[0].equalsIgnoreCase("?")) {
             for (String o : output)
                 player.sendMessage(o);
-        } else if (split.length < 2) {
-            help(player);
         } else if (split[0].equalsIgnoreCase("read")
                 || split[0].equalsIgnoreCase("r")) {
             readCommand(player, split);
         } else if (split[0].equalsIgnoreCase("delete")
                 || split[0].equalsIgnoreCase("d")) {
             closeCommand(player, split);
-        } else if (split.length >= 2) {
+        } else if (split[0].equalsIgnoreCase("write") 
+                || split[0].equalsIgnoreCase("w")
+                || split[0].equalsIgnoreCase("send")
+                || split[0].equalsIgnoreCase("s")) {
             writeCommand(player, split);
         } else {
             help(player);
@@ -100,19 +101,19 @@ public class MailCommand implements CommandExecutor {
     private void writeCommand(Player player, String[] split) {
         if (Mail.permissions.has(player, "mail.write")) {
             String sender = player.getName();
-            String receiver = split[0];
+            String receiver = split[1];
             String message = "";
-            for (int i = 1; i <= split.length - 1; i++) {
-                if (i == 1)
+            for (int i = 2; i <= split.length - 1; i++) {
+                if (i == 2)
                     message += split[i];
                 else
                     message += " " + split[i];
             }
-            ChatTools.formatAndSend(
-                    "<option><green>Your message has been sent.", "Mail",
-                    player);
             MailSQL.sendMail(sender, receiver, message);
             plugin.notifyReceiver(receiver);
+            ChatTools.formatAndSend(
+                    "<option><green>Your message has been sent to "+receiver+".", "Mail",
+                    player);
         } else {
             warn(player, "You dont have permission to perform this action.");
         }
