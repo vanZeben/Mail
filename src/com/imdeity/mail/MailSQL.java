@@ -76,6 +76,9 @@ public class MailSQL {
         if (result.isEmpty()) {
             ChatTools.formatAndSend("<option><gray>Nothing in your inbox.", "Mail",
                     player);
+            ChatTools.formatAndSend(
+                    "<option><yellow>Use \"/mail ?\" for command help.",
+                    "Mail", player);
             return;
         } else {
             for (int i = 1; i <= result.size(); i++) {
@@ -101,7 +104,7 @@ public class MailSQL {
     public static void getSpecificMail(Player player, int id) {
         MailObject tmpMail = getMail(player, id);
         if (tmpMail == null) {
-            ChatTools.formatAndSend("<option><gray>That mail doesn't exist.",
+            ChatTools.formatAndSend("<option><gray>That message doesn't exist.",
                     "Mail", player);
         } else {
             ChatTools.formatAndSend("<option>" + tmpMail.toLongString(),
@@ -126,7 +129,7 @@ public class MailSQL {
      
         int index = getCacheIndex(player.getName(), id);
         if (index == -1)
-            ChatTools.formatAndSend("<option><gray>That mail doesn't exist.",
+            ChatTools.formatAndSend("<option><gray>That message doesn't exist.",
                     "Mail", player);
         else {
             MailObject tmpMail = getMail(player, id);
@@ -136,7 +139,7 @@ public class MailSQL {
                     + " SET `read` = '1' WHERE id=" + index + ";";
 
             Mail.database.Write(sql);   
-            ChatTools.formatAndSend("<option>Success", "Mail", player);
+            ChatTools.formatAndSend("<option>Successfully deleted that message.", "Mail", player);
         }
 
     }

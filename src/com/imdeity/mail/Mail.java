@@ -68,9 +68,9 @@ public class Mail extends JavaPlugin {
     public void notifyReceiver(String playername) {
         Player receiver = this.getPlayer(playername);
         if (receiver != null) {
-            ChatTools.formatAndSend("<option><green>You got a message", "Mail",
+            ChatTools.formatAndSend("<option><green>You have got a message!", "Mail",
                     receiver);
-            ChatTools.formatAndSend("<option><gray>Use /mail to see your inbox", "Mail",
+            ChatTools.formatAndSend("<option><gray>Use /mail to see your inbox.", "Mail",
                     receiver);
         }
     }

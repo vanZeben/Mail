@@ -15,11 +15,15 @@ public class MailPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         int unread = MailSQL.getUnreadCount(player.getName());
         if (unread > 0)
-            ChatTools.formatAndSend(("<option><white>You have <yellow>"
-                    + unread + "<white> unread message in your inbox."), "Mail", player);
+            if (unread == 1)
+                ChatTools.formatAndSend(("<option><white>You have <yellow>"
+                        + unread + "<white> unread message in your inbox."), "Mail", player);
+            else
+                ChatTools.formatAndSend(("<option><white>You have <yellow>"
+                        + unread + "<white> unread messages in your inbox."), "Mail", player);
         else
             ChatTools.formatAndSend(
-                    ("<option><gray>You have no mail in your inbox."), "Mail",
+                    ("<option><gray>Nothing in your inbox."), "Mail",
                     player);
     }
 }

@@ -1,6 +1,6 @@
 name: Mail
 main: com.imdeity.mail.Mail
-version: 0.1
+version: 0.2
 author: vanZeben
 commands:
   mail:

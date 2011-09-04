@@ -15,13 +15,13 @@ public class MailCommand implements CommandExecutor {
 
     static {
         output.add(ChatTools.formatTitle("Mail"));
-        output.add(ChatTools.formatCommand("", "/mail", "", "Checks messages."));
+        output.add(ChatTools.formatCommand("", "/mail", "", "Checks Inbox."));
         output.add(ChatTools.formatCommand("", "/mail", "[player] [message]",
-                "Sends a mail to the specified person."));
+                "Sends a message to the specified person."));
         output.add(ChatTools.formatCommand("", "/mail", "read [num]",
-                "Opens up the specified mail."));
-        output.add(ChatTools.formatCommand("", "/mail", "close [num]",
-                "Removed the specified mail from your inbox."));
+                "Opens up the specified message."));
+        output.add(ChatTools.formatCommand("", "/mail", "delete [num]",
+                "Removes the specified message from your inbox."));
     }
 
     public MailCommand(Mail instance) {
@@ -53,8 +53,8 @@ public class MailCommand implements CommandExecutor {
         } else if (split[0].equalsIgnoreCase("read")
                 || split[0].equalsIgnoreCase("r")) {
             readCommand(player, split);
-        } else if (split[0].equalsIgnoreCase("close")
-                || split[0].equalsIgnoreCase("c")) {
+        } else if (split[0].equalsIgnoreCase("delete")
+                || split[0].equalsIgnoreCase("d")) {
             closeCommand(player, split);
         } else if (split.length >= 2) {
             writeCommand(player, split);
@@ -84,7 +84,7 @@ public class MailCommand implements CommandExecutor {
     }
 
     private void closeCommand(Player player, String[] split) {
-        if (Mail.permissions.has(player, "mail.close")) {
+        if (Mail.permissions.has(player, "mail.delete")) {
             int id = 0;
             try {
                 id = Integer.parseInt(split[1]);
