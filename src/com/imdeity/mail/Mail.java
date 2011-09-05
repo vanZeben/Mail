@@ -36,7 +36,6 @@ public class Mail extends JavaPlugin {
             settings = new Settings(this);
             settings.loadSettings("config.yml", "/config.yml");
             
-            System.out.println("Enabling events!");
             getCommand("mail").setExecutor(new MailCommand(this));
             getServer().getPluginManager().registerEvent(
                     Event.Type.PLAYER_JOIN, new MailPlayerListener(this),
