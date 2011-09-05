@@ -73,12 +73,16 @@ public class MailCommand implements CommandExecutor {
     private void readCommand(Player player, String[] split) {
         if (Mail.permissions.has(player, "mail.read")) {
             int id = 0;
-            try {
-                id = Integer.parseInt(split[1]);
-            } catch (NumberFormatException ex) {
+            if (split.length == 2) {
+                try {
+                    id = Integer.parseInt(split[1]);
+                } catch (NumberFormatException ex) {
+                    help(player);
+                }
+                MailSQL.getSpecificMail(player, id);
+            } else {
                 help(player);
             }
-            MailSQL.getSpecificMail(player, id);
         } else {
             warn(player, "You dont have permission to perform this action.");
         }

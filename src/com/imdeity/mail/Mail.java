@@ -19,26 +19,33 @@ public class Mail extends JavaPlugin {
     public static MySQLConnection database = null;
     public static PermissionHandler permissions = null;
     public static ArrayList<MailObject> mailCache = new ArrayList<MailObject>();
+    private boolean hasRegistered = false;
     private Settings settings = null;
 
     @Override
     public void onDisable() {
         out("Disabled");
+
     }
 
     @Override
     public void onEnable() {
-        settings = new Settings(this);
-        settings.loadSettings("config.yml", "/config.yml");
-        
-        getCommand("mail").setExecutor(new MailCommand(this));
-        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN,
-                new MailPlayerListener(this), Event.Priority.High, this);
-        
-        database = new MySQLConnection();
-        database.createDatabaseTables();
-        checkPlugins();
-        
+        if (!this.hasRegistered) {
+            this.hasRegistered = true;
+            
+            settings = new Settings(this);
+            settings.loadSettings("config.yml", "/config.yml");
+            
+            System.out.println("Enabling events!");
+            getCommand("mail").setExecutor(new MailCommand(this));
+            getServer().getPluginManager().registerEvent(
+                    Event.Type.PLAYER_JOIN, new MailPlayerListener(this),
+                    Event.Priority.High, this);
+            
+            database = new MySQLConnection();
+            database.createDatabaseTables();
+            checkPlugins();
+        }
         out("Enabled");
     }
 
@@ -68,9 +75,10 @@ public class Mail extends JavaPlugin {
     public void notifyReceiver(String playername) {
         Player receiver = this.getPlayer(playername);
         if (receiver != null) {
-            ChatTools.formatAndSend("<option><green>You have got a message!", "Mail",
-                    receiver);
-            ChatTools.formatAndSend("<option><gray>Use /mail to see your inbox.", "Mail",
+            ChatTools.formatAndSend("<option><green>You have got a message!",
+                    "Mail", receiver);
+            ChatTools.formatAndSend(
+                    "<option><gray>Use /mail to see your inbox.", "Mail",
                     receiver);
         }
     }
