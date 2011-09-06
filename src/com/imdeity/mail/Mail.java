@@ -25,7 +25,6 @@ public class Mail extends JavaPlugin {
     @Override
     public void onDisable() {
         out("Disabled");
-
     }
 
     @Override

@@ -20,7 +20,7 @@ public class MailCommand implements CommandExecutor {
                 "Sends a message to the specified person."));
         output.add(ChatTools.formatCommand("", "/mail", "read [num]",
                 "Opens up the specified message."));
-        output.add(ChatTools.formatCommand("", "/mail", "delete [num]",
+        output.add(ChatTools.formatCommand("", "/mail", "delete [num/*]",
                 "Removes the specified message from your inbox."));
     }
 
@@ -91,6 +91,10 @@ public class MailCommand implements CommandExecutor {
     private void closeCommand(Player player, String[] split) {
         if (Mail.permissions.has(player, "mail.delete")) {
             int id = 0;
+            if (split[1].equalsIgnoreCase("*")) {
+                MailSQL.setAllClosedMail(player);
+                return;
+            }
             try {
                 id = Integer.parseInt(split[1]);
             } catch (NumberFormatException ex) {

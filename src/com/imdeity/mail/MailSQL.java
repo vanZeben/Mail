@@ -134,10 +134,9 @@ public class MailSQL {
                             "Mail", player);
         else {
             MailObject tmpMail = getMail(player, id);
-            Mail.mailCache.remove(index);
-
             index = getIndex(player.getName(), tmpMail.getMessage());
 
+            Mail.mailCache.clear();
             String sql = "UPDATE " + Mail.database.tableName("mail")
                     + " SET `read` = '1' WHERE id = '" + index + "';";
             Mail.database.Write(sql);
@@ -146,6 +145,17 @@ public class MailSQL {
                     "<option>Successfully deleted that message.", "Mail",
                     player);
         }
+    }
 
+    public static void setAllClosedMail(Player player) {
+
+        Mail.mailCache.clear();
+        String sql = "UPDATE " + Mail.database.tableName("mail")
+                + " SET `read` = '1' WHERE `receiver` = '" + player.getName()
+                + "';";
+        Mail.database.Write(sql);
+
+        ChatTools.formatAndSend("<option>Successfully deleted your mail.",
+                "Mail", player);
     }
 }
