@@ -19,7 +19,6 @@ public class Mail extends JavaPlugin {
     public static MySQLConnection database = null;
     public static PermissionHandler permissions = null;
     public static ArrayList<MailObject> mailCache = new ArrayList<MailObject>();
-    private boolean hasRegistered = false;
     private Settings settings = null;
 
     @Override
@@ -29,22 +28,23 @@ public class Mail extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (!this.hasRegistered) {
-            this.hasRegistered = true;
-            
             settings = new Settings(this);
             settings.loadSettings("config.yml", "/config.yml");
-            
+
             getCommand("mail").setExecutor(new MailCommand(this));
             getServer().getPluginManager().registerEvent(
                     Event.Type.PLAYER_JOIN, new MailPlayerListener(this),
                     Event.Priority.High, this);
-            
-            if (!checkPlugins() && !setupDatabase()) {
-                out("Disabling Plugin, read the thread for setup info");
+
+            try {
+                checkPlugins();
+                setupDatabase();
+            } catch (Exception e) {
+                out("Error:" + e.getMessage() + ", Disabling Plugin.");
+                e.printStackTrace();
                 getServer().getPluginManager().disablePlugin(this);
+                return;
             }
-        }
         out("Enabled");
     }
 
@@ -61,13 +61,13 @@ public class Mail extends JavaPlugin {
             out("Using: " + StringMgmt.join(using, ", ") + ".");
         return check;
     }
-    
+
     public boolean setupDatabase() {
         if (database != null) {
             database = new MySQLConnection();
             database.createDatabaseTables();
         }
-        if (database == null) 
+        if (database == null)
             return false;
         return true;
     }
