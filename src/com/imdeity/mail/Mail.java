@@ -40,23 +40,36 @@ public class Mail extends JavaPlugin {
                     Event.Type.PLAYER_JOIN, new MailPlayerListener(this),
                     Event.Priority.High, this);
             
-            database = new MySQLConnection();
-            database.createDatabaseTables();
-            checkPlugins();
+            if (!checkPlugins() && !setupDatabase()) {
+                out("Disabling Plugin, read the thread for setup info");
+                getServer().getPluginManager().disablePlugin(this);
+            }
         }
         out("Enabled");
     }
 
-    private void checkPlugins() {
+    private boolean checkPlugins() {
         List<String> using = new ArrayList<String>();
-
+        boolean check = false;
         Plugin test = getServer().getPluginManager().getPlugin("Permissions");
         if (test != null) {
             permissions = ((Permissions) test).getHandler();
             using.add("Permissions");
+            check = true;
         }
         if (using.size() > 0)
             out("Using: " + StringMgmt.join(using, ", ") + ".");
+        return check;
+    }
+    
+    public boolean setupDatabase() {
+        if (database != null) {
+            database = new MySQLConnection();
+            database.createDatabaseTables();
+        }
+        if (database == null) 
+            return false;
+        return true;
     }
 
     public Player getPlayer(String playername) {
