@@ -35,17 +35,15 @@ public class Mail extends JavaPlugin {
             getServer().getPluginManager().registerEvent(
                     Event.Type.PLAYER_JOIN, new MailPlayerListener(this),
                     Event.Priority.High, this);
-
-            try {
-                checkPlugins();
-                setupDatabase();
-            } catch (Exception e) {
-                out("Error:" + e.getMessage() + ", Disabling Plugin.");
-                e.printStackTrace();
+            checkPlugins();
+            setupDatabase();
+            if (database == null || permissions == null) {
+                out("Plugin was setup incorrectly, disabling");
                 getServer().getPluginManager().disablePlugin(this);
-                return;
+            } else {
+                out("Enabled");
             }
-        out("Enabled");
+        
     }
 
     private boolean checkPlugins() {
