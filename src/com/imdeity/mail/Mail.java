@@ -28,22 +28,21 @@ public class Mail extends JavaPlugin {
 
     @Override
     public void onEnable() {
-            settings = new Settings(this);
-            settings.loadSettings("config.yml", "/config.yml");
+        settings = new Settings(this);
+        settings.loadSettings("config.yml", "/config.yml");
 
-            getCommand("mail").setExecutor(new MailCommand(this));
-            getServer().getPluginManager().registerEvent(
-                    Event.Type.PLAYER_JOIN, new MailPlayerListener(this),
-                    Event.Priority.High, this);
-            checkPlugins();
-            setupDatabase();
-            if (database == null || permissions == null) {
-                out("Plugin was setup incorrectly, disabling");
-                getServer().getPluginManager().disablePlugin(this);
-            } else {
-                out("Enabled");
-            }
-        
+        getCommand("mail").setExecutor(new MailCommand(this));
+        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN,
+                new MailPlayerListener(this), Event.Priority.High, this);
+        checkPlugins();
+        setupDatabase();
+        if (database == null || permissions == null) {          
+            out("Plugin was setup incorrectly, disabling");
+            getServer().getPluginManager().disablePlugin(this);
+        } else {
+            out("Enabled");
+        }
+
     }
 
     private boolean checkPlugins() {
@@ -60,14 +59,9 @@ public class Mail extends JavaPlugin {
         return check;
     }
 
-    public boolean setupDatabase() {
-        if (database != null) {
-            database = new MySQLConnection();
-            database.createDatabaseTables();
-        }
-        if (database == null)
-            return false;
-        return true;
+    public void setupDatabase() {
+        database = new MySQLConnection();
+        database.createDatabaseTables();
     }
 
     public Player getPlayer(String playername) {
