@@ -90,4 +90,8 @@ public class Mail extends JavaPlugin {
         PluginDescriptionFile pdfFile = this.getDescription();
         log.info("[" + pdfFile.getName() + "] " + message);
     }
+    
+    public static void sendMailToPlayer(String sender, String receiver, String message) {
+        MailSQL.sendMail(sender, receiver, message);
+    }
 }
