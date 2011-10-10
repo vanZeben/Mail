@@ -72,8 +72,8 @@ public class MailCommand implements CommandExecutor {
 
     private void readCommand(Player player, String[] split) {
         if (Mail.permissions.has(player, "mail.read")) {
-            int id = 0;
             if (split.length == 2) {
+                int id = 0;
                 try {
                     id = Integer.parseInt(split[1]);
                 } catch (NumberFormatException ex) {
@@ -90,17 +90,21 @@ public class MailCommand implements CommandExecutor {
 
     private void closeCommand(Player player, String[] split) {
         if (Mail.permissions.has(player, "mail.delete")) {
-            int id = 0;
-            if (split[1].equalsIgnoreCase("*")) {
-                MailSQL.setAllClosedMail(player);
-                return;
-            }
-            try {
-                id = Integer.parseInt(split[1]);
-            } catch (NumberFormatException ex) {
+            if (split.length == 2) {
+                int id = 0;
+                if (split[1].equalsIgnoreCase("*")) {
+                    MailSQL.setAllClosedMail(player);
+                    return;
+                }
+                try {
+                    id = Integer.parseInt(split[1]);
+                } catch (NumberFormatException ex) {
+                    help(player);
+                }
+                MailSQL.setClosedMail(player, id);
+            } else {
                 help(player);
             }
-            MailSQL.setClosedMail(player, id);
         } else {
             warn(player, "You dont have permission to perform this action.");
         }
