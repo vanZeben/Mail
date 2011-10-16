@@ -7,59 +7,33 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.sql.PreparedStatement;
-import com.avaje.ebeaninternal.server.lib.sql.DataSourceException;
 
 public class MySQLConnection {
 
     private Connection conn;
 
-    public MySQLConnection() {
-
-        // Load the driver instance
-        try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-        } catch (Exception ex) {
-            throw new DataSourceException(
-                    "[Mail] Failed to initialize JDBC driver");
-        }
-
-        // make the connection
-        try {
-            conn = DriverManager.getConnection(getConnectionString());
-            System.out.println("[Mail] Connection success!");
-        } catch (SQLException ex) {
-            dumpSqlException(ex);
-            throw new DataSourceException(
-                    "[Mail] Failed to create connection to Mysql database");
-        }
-
+    public MySQLConnection() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        connect();
         createDatabaseTables();
     }
 
-    public void createDatabaseTables() {
-
+    public void createDatabaseTables() throws SQLException {
         Write("CREATE TABLE IF NOT EXISTS " + tableName("mail") + " ("
                 + "`id` INT(16) NOT NULL AUTO_INCREMENT ,"
                 + "`sender` VARCHAR(16) NOT NULL ,"
                 + "`receiver` VARCHAR(16) NOT NULL ,"
                 + "`message` TEXT NOT NULL ,"
-                + "`read` INT(1) NOT NULL DEFAULT  '0'," + "PRIMARY KEY (`id`),"
-                + "INDEX (`receiver`)"
+                + "`read` INT(1) NOT NULL DEFAULT  '0',"
+                + "PRIMARY KEY (`id`)," + "INDEX (`receiver`)"
                 + ") ENGINE = MyISAM COMMENT = 'In Game Mail';");
 
     }
 
     // check if its closed
-    private void reconnect() {
-        System.out.println("[Mail] Reconnecting to MySQL...");
-        try {
-            conn = DriverManager.getConnection(getConnectionString());
-            System.out.println("[Mail] Connection success!");
-        } catch (SQLException ex) {
-            System.out
-                    .println("[Mail] Connection to MySQL failed! Check status of MySQL server!");
-            dumpSqlException(ex);
-        }
+    private void connect() throws SQLException {
+        conn = DriverManager.getConnection(getConnectionString());
+        System.out.println("[Mail] Connection success!");
     }
 
     private PreparedStatement prepareSqlStatement(String sql, Object[] params)
@@ -86,16 +60,11 @@ public class MySQLConnection {
     }
 
     // write query
-    public boolean Write(String sql, Object... params) {
-        try {
+    public boolean Write(String sql, Object... params) throws SQLException {
             ensureConnection();
             PreparedStatement stmt = prepareSqlStatement(sql, params);
             stmt.executeUpdate();
             return true;
-        } catch (SQLException ex) {
-            dumpSqlException(ex);
-            return false;
-        }
     }
 
     // write query
@@ -133,7 +102,7 @@ public class MySQLConnection {
     private void ensureConnection() {
         try {
             if (!conn.isValid(5)) {
-                reconnect();
+                connect();
             }
         } catch (SQLException ex) {
             dumpSqlException(ex);
@@ -152,7 +121,7 @@ public class MySQLConnection {
          */
         try {
             if (!conn.isValid(5)) {
-                reconnect();
+                connect();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -179,14 +148,15 @@ public class MySQLConnection {
     }
 
     // read query
-    public HashMap<Integer, ArrayList<String>> Read(String sql, Object... params) {
+    public HashMap<Integer, ArrayList<String>> Read(String sql,
+            Object... params) {
 
         /*
          * Double check connection to MySQL
          */
         try {
             if (!conn.isValid(5)) {
-                reconnect();
+                connect();
             }
         } catch (SQLException e) {
             e.printStackTrace();

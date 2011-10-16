@@ -1,5 +1,6 @@
 package com.imdeity.mail;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -52,7 +53,7 @@ public class MailSQL {
     }
 
     public static boolean sendMail(String sender, String receiver,
-            String message) {
+            String message) throws SQLException {
         String sql = "INSERT INTO " + Mail.database.tableName("mail") + " ("
                 + "`sender`, `receiver`, `message`" + ") values (?,?,?);";
 
@@ -125,7 +126,7 @@ public class MailSQL {
         return null;
     }
 
-    public static void setClosedMail(Player player, int id) {
+    public static void setClosedMail(Player player, int id) throws SQLException {
 
         int index = getCacheIndex(player.getName(), id);
         if (index == -1)
@@ -147,7 +148,7 @@ public class MailSQL {
         }
     }
 
-    public static void setAllClosedMail(Player player) {
+    public static void setAllClosedMail(Player player) throws SQLException {
 
         Mail.mailCache.clear();
         String sql = "UPDATE " + Mail.database.tableName("mail")

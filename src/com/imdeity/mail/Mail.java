@@ -1,5 +1,6 @@
 package com.imdeity.mail;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -16,9 +17,11 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 public class Mail extends JavaPlugin {
 
     public final Logger log = Logger.getLogger("Minecraft");
+    public static Mail mail = null;
     public static MySQLConnection database = null;
     public static PermissionHandler permissions = null;
     public static ArrayList<MailObject> mailCache = new ArrayList<MailObject>();
+    public static boolean hasError = false;
     private Settings settings = null;
 
     @Override
@@ -30,18 +33,27 @@ public class Mail extends JavaPlugin {
     public void onEnable() {
         settings = new Settings(this);
         settings.loadSettings("config.yml", "/config.yml");
+        Mail.mail = this;
 
         getCommand("mail").setExecutor(new MailCommand(this));
-        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN,
-                new MailPlayerListener(this), Event.Priority.High, this);
+        
+
         checkPlugins();
-        setupDatabase();
-        if (database == null || permissions == null) {          
-            out("Plugin was setup incorrectly, disabling");
-            getServer().getPluginManager().disablePlugin(this);
-        } else {
-            out("Enabled");
+        try {
+            setupDatabase();
+        } catch (Exception ex) {
+            out("Database is set up incorrectly. Please configure the config.yml before procedeing");
+            hasError = true;
         }
+        if (permissions == null) {
+            out("Permissions doesn't exist. You should probably go download it.");
+            hasError = true;
+        } 
+        if (!hasError) {
+            getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN,
+                new MailPlayerListener(this), Event.Priority.High, this);
+        }
+        out("Enabled");
 
     }
 
@@ -59,9 +71,8 @@ public class Mail extends JavaPlugin {
         return check;
     }
 
-    public void setupDatabase() {
+    public void setupDatabase() throws Exception {
         database = new MySQLConnection();
-        database.createDatabaseTables();
     }
 
     public Player getPlayer(String playername) {
@@ -90,8 +101,11 @@ public class Mail extends JavaPlugin {
         PluginDescriptionFile pdfFile = this.getDescription();
         log.info("[" + pdfFile.getName() + "] " + message);
     }
-    
-    public static void sendMailToPlayer(String sender, String receiver, String message) {
+
+    public static void sendMailToPlayer(String sender, String receiver,
+            String message) throws SQLException {
         MailSQL.sendMail(sender, receiver, message);
+        if (Mail.mail.getPlayer(receiver).isOnline())
+            Mail.mail.notifyReceiver(receiver);
     }
 }

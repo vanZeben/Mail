@@ -1,5 +1,6 @@
 package com.imdeity.mail;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,8 @@ public class MailCommand implements CommandExecutor {
     static {
         output.add(ChatTools.formatTitle("Mail"));
         output.add(ChatTools.formatCommand("", "/mail", "", "Checks Inbox."));
-        output.add(ChatTools.formatCommand("", "/mail write", "[player] [message]",
+        output.add(ChatTools.formatCommand("", "/mail write",
+                "[player] [message]",
                 "Sends a message to the specified person."));
         output.add(ChatTools.formatCommand("", "/mail", "read [num]",
                 "Opens up the specified message."));
@@ -32,16 +34,28 @@ public class MailCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd,
             String commandLabel, String args[]) {
+        if (Mail.hasError) {
+            ChatTools
+                    .formatAndSend(
+                            "<option><red>HEY IDIOT, PLUGIN DATABASE IS NOT SET UP CORRECTLY. GO CONFIGURE THE CONFIG.YML",
+                            "Mail", sender);
+            return false;
+        }
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            parseCommand(player, args);
+            try {
+                parseCommand(player, args);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
             return true;
         } else {
             return false;
         }
     }
 
-    public void parseCommand(Player player, String[] split) {
+    public void parseCommand(Player player, String[] split) throws SQLException {
         if (split.length == 0) {
             checkMail(player);
         } else if (split[0].equalsIgnoreCase("help")
@@ -54,7 +68,7 @@ public class MailCommand implements CommandExecutor {
         } else if (split[0].equalsIgnoreCase("delete")
                 || split[0].equalsIgnoreCase("d")) {
             closeCommand(player, split);
-        } else if (split[0].equalsIgnoreCase("write") 
+        } else if (split[0].equalsIgnoreCase("write")
                 || split[0].equalsIgnoreCase("w")
                 || split[0].equalsIgnoreCase("send")
                 || split[0].equalsIgnoreCase("s")) {
@@ -88,7 +102,8 @@ public class MailCommand implements CommandExecutor {
         }
     }
 
-    private void closeCommand(Player player, String[] split) {
+    private void closeCommand(Player player, String[] split)
+            throws SQLException {
         if (Mail.permissions.has(player, "mail.delete")) {
             if (split.length == 2) {
                 int id = 0;
@@ -110,7 +125,8 @@ public class MailCommand implements CommandExecutor {
         }
     }
 
-    private void writeCommand(Player player, String[] split) {
+    private void writeCommand(Player player, String[] split)
+            throws SQLException {
         if (Mail.permissions.has(player, "mail.write")) {
             String sender = player.getName();
             String receiver = split[1];
@@ -124,8 +140,8 @@ public class MailCommand implements CommandExecutor {
             MailSQL.sendMail(sender, receiver, message);
             plugin.notifyReceiver(receiver);
             ChatTools.formatAndSend(
-                    "<option><green>Your message has been sent to "+receiver+".", "Mail",
-                    player);
+                    "<option><green>Your message has been sent to " + receiver
+                            + ".", "Mail", player);
         } else {
             warn(player, "You dont have permission to perform this action.");
         }

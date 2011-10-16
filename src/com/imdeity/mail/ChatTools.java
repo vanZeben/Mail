@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class ChatTools {
@@ -241,6 +242,12 @@ public class ChatTools {
     }
     
     public static void formatAndSend(String msg, String option, Player player) {
+        String message = formatMessage(msg, option);
+        
+        player.sendMessage(message);
+    }
+    
+    public static void formatAndSend(String msg, String option, CommandSender player) {
         String message = formatMessage(msg, option);
         
         player.sendMessage(message);
