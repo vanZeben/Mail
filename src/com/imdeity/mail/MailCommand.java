@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 public class MailCommand implements CommandExecutor {
 
     private static final List<String> output = new ArrayList<String>();
-    private Mail plugin = null;
 
     static {
         output.add(ChatTools.formatTitle("Mail"));
@@ -26,19 +25,11 @@ public class MailCommand implements CommandExecutor {
                 "Removes the specified message from your inbox."));
     }
 
-    public MailCommand(Mail instance) {
-        this.plugin = instance;
-
-    }
-
     @Override
     public boolean onCommand(CommandSender sender, Command cmd,
             String commandLabel, String args[]) {
         if (Mail.hasError) {
-            ChatTools
-                    .formatAndSend(
-                            "<option><red>HEY IDIOT, PLUGIN DATABASE IS NOT SET UP CORRECTLY. GO CONFIGURE THE CONFIG.YML",
-                            "Mail", sender);
+            sender.sendMessage("[Mail] Config is not set up correctly. Commands will not work until this is fixed");
             return false;
         }
         if (sender instanceof Player) {
@@ -48,7 +39,6 @@ public class MailCommand implements CommandExecutor {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-
             return true;
         } else {
             return false;
@@ -138,7 +128,6 @@ public class MailCommand implements CommandExecutor {
                     message += " " + split[i];
             }
             MailSQL.sendMail(sender, receiver, message);
-            plugin.notifyReceiver(receiver);
             ChatTools.formatAndSend(
                     "<option><green>Your message has been sent to " + receiver
                             + ".", "Mail", player);

@@ -30,12 +30,12 @@ public class MailObject {
     
     public String toShortString() {
         String message = "";
-        message = "<gray>[" + this.id + "]<white> " + this.sender + ":<gray> " + StringMgmt.maxLength(this.message, 30);
+        message = "<gray>[" + this.index + "]<white> " + this.sender + ":<gray> " + StringMgmt.maxLength(this.message, 30);
         return message;
     }
     public String toLongString() {
         String message = "";
-        message = "<white>" + this.sender + ":<gray> " + this.message;
+        message = "<gray>[" + this.index + "]<white> " + this.sender + ":<gray> " + this.message;
         return message;
     }
 }

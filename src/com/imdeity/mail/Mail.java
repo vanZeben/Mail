@@ -16,96 +16,95 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class Mail extends JavaPlugin {
 
-    public final Logger log = Logger.getLogger("Minecraft");
-    public static Mail mail = null;
-    public static MySQLConnection database = null;
-    public static PermissionHandler permissions = null;
-    public static ArrayList<MailObject> mailCache = new ArrayList<MailObject>();
-    public static boolean hasError = false;
-    private Settings settings = null;
+	public final Logger log = Logger.getLogger("Minecraft");
+	public static Mail mail = null;
+	public static MySQLConnection database = null;
+	public static PermissionHandler permissions = null;
+	public static boolean hasError = false;
+	private Settings settings = null;
 
-    @Override
-    public void onDisable() {
-        out("Disabled");
-    }
+	@Override
+	public void onDisable() {
+		out("Disabled");
+	}
 
-    @Override
-    public void onEnable() {
-        settings = new Settings(this);
-        settings.loadSettings("config.yml", "/config.yml");
-        Mail.mail = this;
+	@Override
+	public void onEnable() {
+		settings = new Settings(this);
+		settings.loadSettings("config.yml", "/config.yml");
+		Mail.mail = this;
 
-        getCommand("mail").setExecutor(new MailCommand(this));
-        
+		getCommand("mail").setExecutor(new MailCommand());
 
-        checkPlugins();
-        try {
-            setupDatabase();
-        } catch (Exception ex) {
-            out("Database is set up incorrectly. Please configure the config.yml before procedeing");
-            hasError = true;
-        }
-        if (permissions == null) {
-            out("Permissions doesn't exist. You should probably go download it.");
-            hasError = true;
-        } 
-        if (!hasError) {
-            getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN,
-                new MailPlayerListener(this), Event.Priority.High, this);
-        }
-        out("Enabled");
+		checkPlugins();
+		try {
+			setupDatabase();
+		} catch (Exception ex) {
+			out("Database is set up incorrectly. Please configure the config.yml before procedeing");
+			hasError = true;
+		}
+		if (permissions == null) {
+			out("Permissions doesn't exist. You should probably go download it.");
+			hasError = true;
+		}
+		if (!hasError) {
+			getServer().getPluginManager().registerEvent(
+					Event.Type.PLAYER_JOIN, new MailPlayerListener(this),
+					Event.Priority.High, this);
+		}
+		out("Enabled");
 
-    }
+	}
 
-    private boolean checkPlugins() {
-        List<String> using = new ArrayList<String>();
-        boolean check = false;
-        Plugin test = getServer().getPluginManager().getPlugin("Permissions");
-        if (test != null) {
-            permissions = ((Permissions) test).getHandler();
-            using.add("Permissions");
-            check = true;
-        }
-        if (using.size() > 0)
-            out("Using: " + StringMgmt.join(using, ", ") + ".");
-        return check;
-    }
+	private boolean checkPlugins() {
+		List<String> using = new ArrayList<String>();
+		boolean check = false;
+		Plugin test = getServer().getPluginManager().getPlugin("Permissions");
+		if (test != null) {
+			permissions = ((Permissions) test).getHandler();
+			using.add("Permissions");
+			check = true;
+		}
+		if (using.size() > 0)
+			out("Using: " + StringMgmt.join(using, ", ") + ".");
+		return check;
+	}
 
-    public void setupDatabase() throws Exception {
-        database = new MySQLConnection();
-    }
+	public void setupDatabase() throws Exception {
+		database = new MySQLConnection();
+	}
 
-    public Player getPlayer(String playername) {
-        Player player = null;
-        for (Player checkPlayer : this.getServer().getOnlinePlayers()) {
-            if (checkPlayer.getName().equalsIgnoreCase(playername)) {
-                player = checkPlayer;
-                return player;
-            }
-        }
-        return null;
-    }
+	public Player getPlayer(String playername) {
+		Player player = null;
+		for (Player checkPlayer : this.getServer().getOnlinePlayers()) {
+			if (checkPlayer.getName().equalsIgnoreCase(playername)) {
+				player = checkPlayer;
+				return player;
+			}
+		}
+		return null;
+	}
 
-    public void notifyReceiver(String playername) {
-        Player receiver = this.getPlayer(playername);
-        if (receiver != null) {
-            ChatTools.formatAndSend("<option><green>You have got a message!",
-                    "Mail", receiver);
-            ChatTools.formatAndSend(
-                    "<option><gray>Use /mail to see your inbox.", "Mail",
-                    receiver);
-        }
-    }
+	public void notifyReceiver(String playername) {
+		Player receiver = this.getPlayer(playername);
+		if (receiver != null) {
+			ChatTools.formatAndSend("<option><green>You have got a message!",
+					"Mail", receiver);
+			ChatTools.formatAndSend(
+					"<option><gray>Use /mail to see your inbox.", "Mail",
+					receiver);
+		}
+	}
 
-    public void out(String message) {
-        PluginDescriptionFile pdfFile = this.getDescription();
-        log.info("[" + pdfFile.getName() + "] " + message);
-    }
+	public void out(String message) {
+		PluginDescriptionFile pdfFile = this.getDescription();
+		log.info("[" + pdfFile.getName() + "] " + message);
+	}
 
-    public static void sendMailToPlayer(String sender, String receiver,
-            String message) throws SQLException {
-        MailSQL.sendMail(sender, receiver, message);
-        if (Mail.mail.getPlayer(receiver).isOnline())
-            Mail.mail.notifyReceiver(receiver);
-    }
+	public static void sendMailToPlayer(String sender, String receiver,
+			String message) throws SQLException {
+		MailSQL.sendMail(sender, receiver, message);
+		if (Mail.mail.getPlayer(receiver).isOnline())
+			Mail.mail.notifyReceiver(receiver);
+	}
 }
