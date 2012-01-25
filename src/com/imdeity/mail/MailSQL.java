@@ -55,6 +55,9 @@ public class MailSQL {
 			return;
 		} else {
 			for (int i = 1; i <= result.size(); i++) {
+				if (i >= 15) {
+					return;
+				}
 				int index = Integer.parseInt(result.get(i).get(0));
 				int id = Integer.parseInt(result.get(i).get(1));
 				String sender = result.get(i).get(2);
