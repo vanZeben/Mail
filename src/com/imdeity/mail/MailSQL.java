@@ -101,14 +101,12 @@ public class MailSQL {
 
 	public static void setClosedMail(Player player, int id) throws SQLException {
 		MailObject tmpMail = getMail(player, id);
-		System.out.println(tmpMail.getId()+"");
-			String sql = "UPDATE " + Mail.database.tableName("mail")
-					+ " SET `read` = '1' WHERE id = '" + tmpMail.getId() + "';";
-			Mail.database.Write(sql);
-			ChatTools.formatAndSend(
-					"<option>Successfully deleted that message.", "Mail",
-					player);
-		
+		String sql = "UPDATE " + Mail.database.tableName("mail")
+				+ " SET `read` = '1' WHERE id = '" + tmpMail.getId() + "';";
+		Mail.database.Write(sql);
+		ChatTools.formatAndSend("<option>Successfully deleted that message.",
+				"Mail", player);
+
 	}
 
 	public static void setAllClosedMail(Player player) throws SQLException {
