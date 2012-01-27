@@ -1,4 +1,4 @@
-package com.imdeity.mail;
+package com.imdeity.mail.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;

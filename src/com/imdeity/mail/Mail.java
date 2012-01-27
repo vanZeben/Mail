@@ -8,6 +8,12 @@ import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.imdeity.mail.cmd.MailCommand;
+import com.imdeity.mail.event.MailPlayerListener;
+import com.imdeity.mail.sql.MailSQL;
+import com.imdeity.mail.sql.MySQLConnection;
+import com.imdeity.mail.util.ChatTools;
+
 public class Mail extends JavaPlugin {
 
 	public final Logger log = Logger.getLogger("Minecraft");
@@ -78,7 +84,9 @@ public class Mail extends JavaPlugin {
 	public static void sendMailToPlayer(String sender, String receiver,
 			String message) throws SQLException {
 		MailSQL.sendMail(sender, receiver, message);
-		if (Mail.mail.getPlayer(receiver).isOnline())
-			Mail.mail.notifyReceiver(receiver);
+	}
+
+	public static void sendUnreadMailCountMessage(String player) {
+		MailSQL.sendUnreadCount(player);
 	}
 }

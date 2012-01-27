@@ -1,4 +1,4 @@
-package com.imdeity.mail;
+package com.imdeity.mail.cmd;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,6 +8,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.imdeity.mail.Mail;
+import com.imdeity.mail.sql.MailSQL;
+import com.imdeity.mail.util.ChatTools;
 
 public class MailCommand implements CommandExecutor {
 

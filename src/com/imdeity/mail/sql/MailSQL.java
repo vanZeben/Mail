@@ -1,10 +1,15 @@
-package com.imdeity.mail;
+package com.imdeity.mail.sql;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.bukkit.entity.Player;
+
+import com.imdeity.mail.Mail;
+import com.imdeity.mail.object.MailObject;
+import com.imdeity.mail.util.ChatTools;
 
 public class MailSQL {
 	public Mail plugin;
@@ -82,20 +87,21 @@ public class MailSQL {
 		}
 	}
 
-	private static MailObject getMail(Player player, int id) {
-		String sql = "SELECT @rownum:=@rownum+1 AS rownum, id, sender, receiver, message FROM "
+	private static MailObject getMail(Player player, int offset) {
+		String sql = "SELECT @rownum:=@rownum+1 AS rownum, id, sender, message, send_date FROM "
 				+ Mail.database.tableName("mail")
 				+ ", (SELECT @rownum:=0) r WHERE `receiver` = '"
-				+ player.getName().toLowerCase() + "' AND `read` = '0';";
-		HashMap<Integer, ArrayList<String>> result = Mail.database.Read(sql);
-		if (!result.isEmpty() && result.size() >= id) {
-			int index = Integer.parseInt(result.get(id).get(0));
-			int id1 = Integer.parseInt(result.get(id).get(1));
-			String sender = result.get(id).get(2);
-			String receiver = result.get(id).get(3);
-			String message = result.get(id).get(4);
-			MailObject mail = new MailObject(id1, index, sender, receiver,
-					message);
+				+ player.getName() + "' AND `read` = '0';";
+		HashMap<Integer, ArrayList<Object>> result = Mail.database.Read2(sql);
+		if (!result.isEmpty() && result.size() >= offset) {
+			int index = Integer.parseInt("" + result.get(offset).get(0));
+			int id = Integer.parseInt("" + result.get(offset).get(1));
+			String sender = "" + result.get(offset).get(2);
+			String receiver = player.getName();
+			String message = "" + result.get(offset).get(3);
+			Date sendDate = (Date) result.get(offset).get(4);
+			MailObject mail = new MailObject(id, index, sender, receiver,
+					message, sendDate);
 			return mail;
 		}
 		return null;
@@ -118,5 +124,29 @@ public class MailSQL {
 		Mail.database.Write(sql);
 		ChatTools.formatAndSend("<option>Successfully deleted your mail.",
 				"Mail", player);
+	}
+
+	public static void sendUnreadCount(String playername) {
+		Player player = Mail.mail.getPlayer(playername);
+		if (player.isOnline()) {
+			int unread = MailSQL.getUnreadCount(player.getName());
+			if (unread > 0)
+				if (unread == 1)
+					ChatTools
+							.formatAndSend(
+									("<option><white>You have <yellow>"
+											+ unread + "<white> unread message in your inbox."),
+									"Mail", player);
+				else
+					ChatTools
+							.formatAndSend(
+									("<option><white>You have <yellow>"
+											+ unread + "<white> unread messages in your inbox."),
+									"Mail", player);
+			else
+				ChatTools.formatAndSend(
+						("<option><gray>Nothing in your inbox."), "Mail",
+						player);
+		}
 	}
 }

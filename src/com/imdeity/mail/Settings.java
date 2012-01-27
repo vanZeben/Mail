@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.bukkit.util.config.Configuration;
 
+import com.imdeity.mail.util.FileMgmt;
+
 @SuppressWarnings("deprecation")
 public class Settings {
 
@@ -49,6 +51,7 @@ public class Settings {
 	/*
 	 * Functions to pull data from the config and language files
 	 */
+	
 	private static String[] parseString(String str) {
 		return parseSingleLineString(str).split("@");
 	}
