@@ -75,8 +75,38 @@ public class MailSQL {
 		}
 	}
 
+	public static void getAllMail(Player player, String playername) {
+		String sql = "SELECT id, sender, receiver, message FROM "
+				+ Mail.database.tableName("mail") + " WHERE `receiver` = '"
+				+ playername + "' AND `read` = '0';";
+		HashMap<Integer, ArrayList<String>> result = Mail.database.Read(sql);
+		if (result.isEmpty()) {
+			ChatTools.formatAndSend("<option><gray>Nothing in " + playername
+					+ "'s inbox.", "Mail", player);
+			ChatTools.formatAndSend(
+					"<option><yellow>Use \"/mail ?\" for command help.",
+					"Mail", player);
+			return;
+		} else {
+			for (int i = 1; i <= result.size(); i++) {
+				if (i >= 15) {
+					return;
+				}
+				int index = i;
+				int id = Integer.parseInt(result.get(i).get(0));
+				String sender = result.get(i).get(1);
+				String receiver = result.get(i).get(2);
+				String message = result.get(i).get(3);
+				MailObject mail = new MailObject(id, index, sender, receiver,
+						message);
+				ChatTools.formatAndSend("<option>" + mail.toShortString(),
+						"Mail", player);
+			}
+		}
+	}
+
 	public static void getSpecificMail(Player player, int id) {
-		MailObject tmpMail = getMail(player, id);
+		MailObject tmpMail = getMail(player.getName(), id);
 		if (tmpMail == null) {
 			ChatTools
 					.formatAndSend("<option><gray>That message doesn't exist.",
@@ -87,19 +117,37 @@ public class MailSQL {
 		}
 	}
 
-	private static MailObject getMail(Player player, int offset) {
+	public static void getSpecificMail(Player player, String playername, int id) {
+		MailObject tmpMail = getMail(playername, id);
+		if (tmpMail == null) {
+			ChatTools
+					.formatAndSend("<option><gray>That message doesn't exist.",
+							"Mail", player);
+		} else {
+			ChatTools.formatAndSend("<option>" + tmpMail.toLongString(),
+					"Mail", player);
+		}
+	}
+
+	private static MailObject getMail(String player, int offset) {
 		String sql = "SELECT @rownum:=@rownum+1 AS rownum, id, sender, message, send_date FROM "
 				+ Mail.database.tableName("mail")
 				+ ", (SELECT @rownum:=0) r WHERE `receiver` = '"
-				+ player.getName() + "' AND `read` = '0';";
+				+ player
+				+ "' AND `read` = '0';";
 		HashMap<Integer, ArrayList<Object>> result = Mail.database.Read2(sql);
 		if (!result.isEmpty() && result.size() >= offset) {
 			int index = Integer.parseInt("" + result.get(offset).get(0));
 			int id = Integer.parseInt("" + result.get(offset).get(1));
 			String sender = "" + result.get(offset).get(2);
-			String receiver = player.getName();
+			String receiver = player;
 			String message = "" + result.get(offset).get(3);
-			Date sendDate = (Date) result.get(offset).get(4);
+			Date sendDate = null;
+			try {
+				sendDate = (Date) result.get(offset).get(4);
+			} catch (Exception ex) {
+
+			}
 			MailObject mail = new MailObject(id, index, sender, receiver,
 					message, sendDate);
 			return mail;
@@ -108,7 +156,7 @@ public class MailSQL {
 	}
 
 	public static void setClosedMail(Player player, int id) throws SQLException {
-		MailObject tmpMail = getMail(player, id);
+		MailObject tmpMail = getMail(player.getName(), id);
 		String sql = "UPDATE " + Mail.database.tableName("mail")
 				+ " SET `read` = '1' WHERE id = '" + tmpMail.getId() + "';";
 		Mail.database.Write(sql);

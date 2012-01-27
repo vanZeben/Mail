@@ -3,8 +3,6 @@ package com.imdeity.mail;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.util.config.Configuration;
 
@@ -14,7 +12,6 @@ import com.imdeity.mail.util.FileMgmt;
 public class Settings {
 
 	private static Configuration config;
-	private static Configuration language;
 	private Mail plugin = null;
 
 	public Settings(Mail instance) {
@@ -48,32 +45,8 @@ public class Settings {
 		}
 	}
 
-	/*
-	 * Functions to pull data from the config and language files
-	 */
-	
-	private static String[] parseString(String str) {
-		return parseSingleLineString(str).split("@");
-	}
-
-	private static String parseSingleLineString(String str) {
-		return str.replaceAll("&", "\u00A7");
-	}
-
-	private static Boolean getBoolean(String root) {
-		return config.getBoolean(root.toLowerCase(), true);
-	}
-
-	private static Double getDouble(String root) {
-		return config.getDouble(root.toLowerCase(), 0);
-	}
-
 	private static Integer getInt(String root) {
 		return config.getInt(root.toLowerCase(), 0);
-	}
-
-	private static Long getLong(String root) {
-		return Long.parseLong(getString(root).trim());
 	}
 
 	/*
@@ -81,40 +54,6 @@ public class Settings {
 	 */
 	private static String getString(String root) {
 		return config.getString(root.toLowerCase());
-	}
-
-	private static String getLangString(String root) {
-		return parseSingleLineString(language.getString(root.toLowerCase()));
-	}
-
-	/*
-	 * Read a comma delimited string into an Integer list
-	 */
-	private static List<Integer> getIntArr(String root) {
-
-		String[] strArray = getString(root.toLowerCase()).split(",");
-		List<Integer> list = new ArrayList<Integer>();
-		if (strArray != null) {
-			for (int ctr = 0; ctr < strArray.length; ctr++)
-				if (strArray[ctr] != null)
-					list.add(Integer.parseInt(strArray[ctr].trim()));
-		}
-		return list;
-	}
-
-	/*
-	 * Read a comma delimited string into a trimmed list.
-	 */
-	private static List<String> getStrArr(String root) {
-
-		String[] strArray = getString(root.toLowerCase()).split(",");
-		List<String> list = new ArrayList<String>();
-		if (strArray != null) {
-			for (int ctr = 0; ctr < strArray.length; ctr++)
-				if (strArray[ctr] != null)
-					list.add(strArray[ctr].trim());
-		}
-		return list;
 	}
 
 	/*
