@@ -41,9 +41,8 @@ public class MailSQL {
 	}
 
 	public static void getAllMail(Player player) {
-		String sql = "SELECT @rownum:=@rownum+1 AS rownum, id, sender, receiver, message FROM "
-				+ Mail.database.tableName("mail")
-				+ ", (SELECT @rownum:=0) r WHERE `receiver` = '"
+		String sql = "SELECT id, sender, receiver, message FROM "
+				+ Mail.database.tableName("mail") + " WHERE `receiver` = '"
 				+ player.getName().toLowerCase() + "' AND `read` = '0';";
 		HashMap<Integer, ArrayList<String>> result = Mail.database.Read(sql);
 		if (result.isEmpty()) {
@@ -58,11 +57,11 @@ public class MailSQL {
 				if (i >= 15) {
 					return;
 				}
-				int index = Integer.parseInt(result.get(i).get(0));
-				int id = Integer.parseInt(result.get(i).get(1));
-				String sender = result.get(i).get(2);
-				String receiver = result.get(i).get(3);
-				String message = result.get(i).get(4);
+				int index = i;
+				int id = Integer.parseInt(result.get(i).get(0));
+				String sender = result.get(i).get(1);
+				String receiver = result.get(i).get(2);
+				String message = result.get(i).get(3);
 				MailObject mail = new MailObject(id, index, sender, receiver,
 						message);
 				ChatTools.formatAndSend("<option>" + mail.toShortString(),
