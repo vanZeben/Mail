@@ -69,13 +69,13 @@ public class MailCommand implements CommandExecutor {
     }
 
     private void checkMail(Player player) {
-        if (Mail.permissions.has(player, "mail.read")) {
+        if (player.hasPermission("mail.read")) {
             MailSQL.getAllMail(player);
         }
     }
 
     private void readCommand(Player player, String[] split) {
-        if (Mail.permissions.has(player, "mail.read")) {
+        if (player.hasPermission("mail.read")) {
             if (split.length == 2) {
                 int id = 0;
                 try {
@@ -94,7 +94,7 @@ public class MailCommand implements CommandExecutor {
 
     private void closeCommand(Player player, String[] split)
             throws SQLException {
-        if (Mail.permissions.has(player, "mail.delete")) {
+        if (player.hasPermission("mail.delete")) {
             if (split.length == 2) {
                 int id = 0;
                 if (split[1].equalsIgnoreCase("*")) {
@@ -117,7 +117,7 @@ public class MailCommand implements CommandExecutor {
 
     private void writeCommand(Player player, String[] split)
             throws SQLException {
-        if (Mail.permissions.has(player, "mail.write")) {
+        if (player.hasPermission("mail.write")) {
             String sender = player.getName();
             String receiver = split[1];
             String message = "";

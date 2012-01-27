@@ -1,25 +1,18 @@
 package com.imdeity.mail;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class Mail extends JavaPlugin {
 
 	public final Logger log = Logger.getLogger("Minecraft");
 	public static Mail mail = null;
 	public static MySQLConnection database = null;
-	public static PermissionHandler permissions = null;
 	public static boolean hasError = false;
 	private Settings settings = null;
 
@@ -36,15 +29,10 @@ public class Mail extends JavaPlugin {
 
 		getCommand("mail").setExecutor(new MailCommand());
 
-		checkPlugins();
 		try {
 			setupDatabase();
 		} catch (Exception ex) {
 			out("Database is set up incorrectly. Please configure the config.yml before procedeing");
-			hasError = true;
-		}
-		if (permissions == null) {
-			out("Permissions doesn't exist. You should probably go download it.");
 			hasError = true;
 		}
 		if (!hasError) {
@@ -54,20 +42,6 @@ public class Mail extends JavaPlugin {
 		}
 		out("Enabled");
 
-	}
-
-	private boolean checkPlugins() {
-		List<String> using = new ArrayList<String>();
-		boolean check = false;
-		Plugin test = getServer().getPluginManager().getPlugin("Permissions");
-		if (test != null) {
-			permissions = ((Permissions) test).getHandler();
-			using.add("Permissions");
-			check = true;
-		}
-		if (using.size() > 0)
-			out("Using: " + StringMgmt.join(using, ", ") + ".");
-		return check;
 	}
 
 	public void setupDatabase() throws Exception {

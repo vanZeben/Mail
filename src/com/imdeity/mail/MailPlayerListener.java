@@ -13,7 +13,7 @@ public class MailPlayerListener extends PlayerListener {
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		if (Mail.permissions.has(player, "mail.join")) {
+		if (player.hasPermission("mail.join")) {
 			int unread = MailSQL.getUnreadCount(player.getName());
 			if (unread > 0)
 				if (unread == 1)
