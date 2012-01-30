@@ -157,6 +157,11 @@ public class MailSQL {
 
 	public static void setClosedMail(Player player, int id) throws SQLException {
 		MailObject tmpMail = getMail(player.getName(), id);
+		if (tmpMail == null) {
+			ChatTools.formatAndSend("<option><red>That message doesn't exist.",
+					"Mail", player);
+			return;
+		}
 		String sql = "UPDATE " + Mail.database.tableName("mail")
 				+ " SET `read` = '1' WHERE id = '" + tmpMail.getId() + "';";
 		Mail.database.Write(sql);

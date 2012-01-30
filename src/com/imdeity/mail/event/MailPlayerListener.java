@@ -1,20 +1,22 @@
 package com.imdeity.mail.event;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 
 import com.imdeity.mail.Mail;
 import com.imdeity.mail.sql.MailSQL;
 
-public class MailPlayerListener extends PlayerListener {
+public class MailPlayerListener implements Listener {
 
 	public MailPlayerListener(Mail instance) {
 
 	}
 
-	@Override
-	public void onPlayerJoin(PlayerJoinEvent event) {
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void playerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		if (player.hasPermission("mail.player.join")) {
 			MailSQL.sendUnreadCount(player.getName());

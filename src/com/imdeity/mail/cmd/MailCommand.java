@@ -146,6 +146,17 @@ public class MailCommand implements CommandExecutor {
 	private void writeCommand(Player player, String[] split)
 			throws SQLException {
 		if (player.hasPermission("mail.player.write")) {
+			if (split.length < 3) {
+				this.help(player);
+				return;
+			}
+			if (split.length <= 5) {
+				ChatTools
+						.formatAndSend(
+								"<option><red>Your message has to be longer then 3 words",
+								"Mail", player);
+				return;
+			}
 			String sender = player.getName();
 			String receiver = split[1];
 			String message = "";

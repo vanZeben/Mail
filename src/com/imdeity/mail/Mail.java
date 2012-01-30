@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -42,9 +41,8 @@ public class Mail extends JavaPlugin {
 			hasError = true;
 		}
 		if (!hasError) {
-			getServer().getPluginManager().registerEvent(
-					Event.Type.PLAYER_JOIN, new MailPlayerListener(this),
-					Event.Priority.High, this);
+			getServer().getPluginManager().registerEvents(
+					new MailPlayerListener(this), this);
 		}
 		out("Enabled");
 
