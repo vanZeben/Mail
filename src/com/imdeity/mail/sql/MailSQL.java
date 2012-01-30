@@ -46,6 +46,7 @@ public class MailSQL {
 			Mail.mail.sendPlayerMessage(player, Language.getMailErrorHelp());
 			return;
 		} else {
+			Mail.mail.sendPlayerMessage(player, "&c--[Your Inbox]--");
 			for (int i = 1; i <= result.size(); i++) {
 				if (i >= 15) {
 					return;
@@ -76,6 +77,8 @@ public class MailSQL {
 			Mail.mail.sendPlayerMessage(player, Language.getMailErrorHelp());
 			return;
 		} else {
+			Mail.mail.sendPlayerMessage(player, "&c--[" + playername
+					+ "'s Inbox]--");
 			for (int i = 1; i <= result.size(); i++) {
 				if (i >= 15) {
 					return;
