@@ -78,7 +78,7 @@ public class Language {
 		}
 		if (!lang.contains("mail.command.command")) {
 			lang.set("mail.command.command",
-					"&3%command: &b%explaination");
+					"&3%command: &b%explanation");
 		}
 		this.save();
 	}

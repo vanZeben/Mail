@@ -50,10 +50,10 @@ public class MailCommand implements CommandExecutor {
 		}
 	}
 
-	private String formatCommands(String command, String explaination) {
+	private String formatCommands(String command, String explanation) {
 		String tmp = Language.getMailCommandMessage()
 				.replaceAll("%command", command)
-				.replaceAll("%explaination", explaination);
+				.replaceAll("%explanation", explanation);
 		return tmp;
 	}
 
