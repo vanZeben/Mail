@@ -51,25 +51,17 @@ public class MailObject {
 		return this.message;
 	}
 
-	public String toShortString() {
-		String message = "";
-		message = "<gray>[" + this.index + "]<white> " + this.sender
-				+ ":<gray> " + StringMgmt.maxLength(this.message, 30);
-		return message;
+	public String[] toShortString() {
+		return this.preformReplacement(Language.getMailShortMessage());
 	}
 
-	public String toLongString() {
-		String message = "";
-		message = "<gray>["
-				+ this.index
-				+ "]<white> "
-				+ this.sender
-				+ ":<gray> "
-				+ this.message
-				+ " <darkgray>["
-				+ (this.sendDate != null ? this.timeApproxToDate(sendDate)
-						: "Not Available") + "]";
-		return message;
+	public String[] toLongString() {
+		return this.preformReplacement(Language.getMailLongMessage());
+	}
+
+	public String getSendDate() {
+		return (this.sendDate != null ? this.timeApproxToDate(sendDate)
+				: "Not Available");
 	}
 
 	public String timeApproxToDate(Date date) {
@@ -79,4 +71,18 @@ public class MailObject {
 		return HumanTime.approximately(relativeTime) + " ago";
 	}
 
+	public String[] preformReplacement(String msg) {
+		msg = msg
+				.replaceAll("%messageId", this.getId() + "")
+				.replaceAll("%messageLocalIndex", this.getIndex() + "")
+				.replaceAll("%messageSender", this.getSender())
+				.replaceAll("%messageLongMessage", this.message)
+				.replaceAll("%messageShortMessage",
+						StringMgmt.maxLength(this.message, 30))
+				.replaceAll("%messageReceiver", this.getReceiver())
+				.replaceAll("%messageSendDate", this.getSendDate());
+
+		String[] tmpMsg = msg.split("%newline");
+		return tmpMsg;
+	}
 }

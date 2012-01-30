@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.imdeity.mail.cmd.MailCommand;
 import com.imdeity.mail.event.MailPlayerListener;
+import com.imdeity.mail.object.Language;
 import com.imdeity.mail.sql.MailSQL;
 import com.imdeity.mail.sql.MySQLConnection;
 import com.imdeity.mail.util.ChatTools;
@@ -20,20 +21,19 @@ public class Mail extends JavaPlugin {
 	public static MySQLConnection database = null;
 	public static boolean hasError = false;
 	private Settings settings = null;
+	public Language language = null;
 
 	@Override
 	public void onDisable() {
+		language.save();
 		out("Disabled");
 	}
 
 	@Override
 	public void onEnable() {
-		settings = new Settings(this);
-		settings.loadSettings("config.yml", "/config.yml");
+		this.reloadConfigs();
 		Mail.mail = this;
-
-		getCommand("mail").setExecutor(new MailCommand());
-
+		getCommand("mail").setExecutor(new MailCommand(this));
 		try {
 			setupDatabase();
 		} catch (Exception ex) {
@@ -46,6 +46,15 @@ public class Mail extends JavaPlugin {
 		}
 		out("Enabled");
 
+	}
+
+	public void reloadConfigs() {
+		this.language = null;
+		this.settings = null;
+		this.language = new Language();
+		this.language.loadDefaults();
+		this.settings = new Settings(this);
+		this.settings.loadSettings("config.yml", "/config.yml");
 	}
 
 	public void setupDatabase() throws Exception {
@@ -66,12 +75,13 @@ public class Mail extends JavaPlugin {
 	public void notifyReceiver(String playername) {
 		Player receiver = this.getPlayer(playername);
 		if (receiver != null) {
-			ChatTools.formatAndSend("<option><green>You have got a message!",
-					"Mail", receiver);
-			ChatTools.formatAndSend(
-					"<option><gray>Use /mail to see your inbox.", "Mail",
-					receiver);
+			this.sendPlayerMessage(receiver, Language.getInboxNew());
+			this.sendPlayerMessage(receiver, Language.getInboxCheck());
 		}
+	}
+
+	public void sendPlayerMessage(Player player, String message) {
+		ChatTools.formatAndSend(Language.getHeader() + message, player);
 	}
 
 	public void out(String message) {

@@ -10,24 +10,51 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.imdeity.mail.Mail;
+import com.imdeity.mail.object.Language;
 import com.imdeity.mail.sql.MailSQL;
 import com.imdeity.mail.util.ChatTools;
 
 public class MailCommand implements CommandExecutor {
 
-	private static final List<String> output = new ArrayList<String>();
+	private Mail plugin = null;
 
-	static {
-		output.add(ChatTools.formatTitle("Mail"));
-		output.add(ChatTools.formatCommand("", "/mail", "<player>",
-				"Checks Inbox."));
-		output.add(ChatTools.formatCommand("", "/mail write",
-				"[player] [message]",
-				"Sends a message to the specified person."));
-		output.add(ChatTools.formatCommand("", "/mail", "read <player> [num]",
-				"Opens up the specified message."));
-		output.add(ChatTools.formatCommand("", "/mail", "delete [num/*]",
-				"Removes the specified message from your inbox."));
+	public MailCommand(Mail instance) {
+		plugin = instance;
+	}
+
+	private void sendCommands(Player player) {
+		List<String> output = new ArrayList<String>();
+		output.add(Language.getMailCommandHeader());
+		if (player.hasPermission("mail.admin")) {
+			output.add(this.formatCommands("/mail <player>", "Checks Inbox."));
+			output.add(this.formatCommands("/mail write [player] [message]",
+					"Sends a message to the specified person."));
+			output.add(this.formatCommands("/mail read <player> [num]",
+					"Opens up the specified message."));
+			output.add(this.formatCommands("/mail delete [num/*]",
+					"Removes the specified message from your inbox."));
+			output.add(this.formatCommands("/mail reload",
+					"Reloads the language and config files"));
+		} else {
+			output.add(this.formatCommands("/mail", "Checks Inbox."));
+			output.add(this.formatCommands("/mail write [player] [message]",
+					"Sends a message to the specified person."));
+			output.add(this.formatCommands("/mail read [num]",
+					"Opens up the specified message."));
+			output.add(this.formatCommands("/mail delete [num/*]",
+					"Removes the specified message from your inbox."));
+		}
+		output.add(this.formatCommands("/mail info", "Plugin Information"));
+		for (String msg : output) {
+			ChatTools.formatAndSend(msg, player);
+		}
+	}
+
+	private String formatCommands(String command, String explaination) {
+		String tmp = Language.getMailCommandMessage()
+				.replaceAll("%command", command)
+				.replaceAll("%explaination", explaination);
+		return tmp;
 	}
 
 	@Override
@@ -55,8 +82,7 @@ public class MailCommand implements CommandExecutor {
 			checkMail(player);
 		} else if (split[0].equalsIgnoreCase("help")
 				|| split[0].equalsIgnoreCase("?")) {
-			for (String o : output)
-				player.sendMessage(o);
+			sendCommands(player);
 		} else if (split[0].equalsIgnoreCase("read")
 				|| split[0].equalsIgnoreCase("r")) {
 			readCommand(player, split);
@@ -68,6 +94,21 @@ public class MailCommand implements CommandExecutor {
 				|| split[0].equalsIgnoreCase("send")
 				|| split[0].equalsIgnoreCase("s")) {
 			writeCommand(player, split);
+		} else if (split[0].equalsIgnoreCase("reload")) {
+			Mail.mail.reloadConfig();
+			Mail.mail.sendPlayerMessage(player,
+					"Reloaded Config.yml and Language.yml");
+		} else if (split[0].equalsIgnoreCase("info")) {
+			ArrayList<String> out = new ArrayList<String>();
+			out.add("&3-----[&bMail Information&3]-----");
+			out.add("&3#&0-&b###&0-");
+			out.add("&3&0--&b#&0--&b#    &3Developed by: &bvanZeben");
+			out.add("&3#&0-&b#&0--&b#");
+			out.add("&3#&0-&b#&0--&b#    &3\'The affordable courier.\'");
+			out.add("&3#&0-&b###&0-");
+			for (String s : out) {
+				ChatTools.formatAndSend(s, player);
+			}
 		} else if (split.length == 1) {
 			checkMail(player, split[0]);
 		} else {
@@ -99,7 +140,8 @@ public class MailCommand implements CommandExecutor {
 				}
 				MailSQL.getSpecificMail(player, id);
 			} else {
-				warn(player, "You dont have permission to perform this action.");
+				plugin.sendPlayerMessage(player,
+						Language.getMailErrorPermission());
 			}
 		} else if (split.length == 3) {
 			if (player.hasPermission("mail.admin")) {
@@ -112,7 +154,8 @@ public class MailCommand implements CommandExecutor {
 				}
 				MailSQL.getSpecificMail(player, playername, id);
 			} else {
-				warn(player, "You dont have permission to perform this action.");
+				plugin.sendPlayerMessage(player,
+						Language.getMailErrorPermission());
 			}
 		} else {
 			help(player);
@@ -139,7 +182,7 @@ public class MailCommand implements CommandExecutor {
 				help(player);
 			}
 		} else {
-			warn(player, "You dont have permission to perform this action.");
+			plugin.sendPlayerMessage(player, Language.getMailErrorPermission());
 		}
 	}
 
@@ -151,10 +194,10 @@ public class MailCommand implements CommandExecutor {
 				return;
 			}
 			if (split.length <= 5) {
-				ChatTools
-						.formatAndSend(
-								"<option><red>Your message has to be longer then 3 words",
-								"Mail", player);
+				plugin.sendPlayerMessage(
+						player,
+						Language.getMailNotLongEnough().replaceAll(
+								"%messageLength", "3"));
 				return;
 			}
 			String sender = player.getName();
@@ -167,21 +210,18 @@ public class MailCommand implements CommandExecutor {
 					message += " " + split[i];
 			}
 			MailSQL.sendMail(sender, receiver, message);
-			ChatTools.formatAndSend(
-					"<option><green>Your message has been sent to " + receiver
-							+ ".", "Mail", player);
+			plugin.sendPlayerMessage(
+					player,
+					Language.getMailSent()
+							.replaceAll("%messageReceiver", receiver)
+							.replaceAll("%messageMessage", message));
 		} else {
-			warn(player, "You dont have permission to perform this action.");
+			plugin.sendPlayerMessage(player, Language.getMailErrorPermission());
 		}
 	}
 
 	private void help(Player player) {
-		ChatTools.formatAndSend(
-				"<option><yellow>Invalid Syntax, use \"/mail ?\" for help.",
-				"Mail", player);
+		plugin.sendPlayerMessage(player, Language.getMailErrorHelp());
 	}
 
-	private void warn(Player player, String msg) {
-		ChatTools.formatAndSend("<option><red>" + msg, "Mail", player);
-	}
 }

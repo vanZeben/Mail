@@ -8,8 +8,8 @@ import java.util.HashMap;
 import org.bukkit.entity.Player;
 
 import com.imdeity.mail.Mail;
+import com.imdeity.mail.object.Language;
 import com.imdeity.mail.object.MailObject;
-import com.imdeity.mail.util.ChatTools;
 
 public class MailSQL {
 	public Mail plugin;
@@ -27,15 +27,6 @@ public class MailSQL {
 		return count;
 	}
 
-	// public static int getIndex(String playerName, String message) {
-	// String sql = "SELECT `id` FROM " + Mail.database.tableName("mail")
-	// + " WHERE `receiver` = '" + playerName + "' AND `message` = ?;";
-	// HashMap<Integer, ArrayList<String>> result = Mail.database.Read(sql,
-	// message);
-	// int index = Integer.parseInt(result.get(1).get(0));
-	// return index;
-	// }
-
 	public static boolean sendMail(String sender, String receiver,
 			String message) throws SQLException {
 		String sql = "INSERT INTO " + Mail.database.tableName("mail") + " ("
@@ -51,11 +42,8 @@ public class MailSQL {
 				+ player.getName().toLowerCase() + "' AND `read` = '0';";
 		HashMap<Integer, ArrayList<String>> result = Mail.database.Read(sql);
 		if (result.isEmpty()) {
-			ChatTools.formatAndSend("<option><gray>Nothing in your inbox.",
-					"Mail", player);
-			ChatTools.formatAndSend(
-					"<option><yellow>Use \"/mail ?\" for command help.",
-					"Mail", player);
+			Mail.mail.sendPlayerMessage(player, Language.getInboxEmpty());
+			Mail.mail.sendPlayerMessage(player, Language.getMailErrorHelp());
 			return;
 		} else {
 			for (int i = 1; i <= result.size(); i++) {
@@ -69,8 +57,10 @@ public class MailSQL {
 				String message = result.get(i).get(3);
 				MailObject mail = new MailObject(id, index, sender, receiver,
 						message);
-				ChatTools.formatAndSend("<option>" + mail.toShortString(),
-						"Mail", player);
+				for (String s : mail.toShortString()) {
+					Mail.mail.sendPlayerMessage(player, s);
+				}
+
 			}
 		}
 	}
@@ -81,11 +71,9 @@ public class MailSQL {
 				+ playername + "' AND `read` = '0';";
 		HashMap<Integer, ArrayList<String>> result = Mail.database.Read(sql);
 		if (result.isEmpty()) {
-			ChatTools.formatAndSend("<option><gray>Nothing in " + playername
-					+ "'s inbox.", "Mail", player);
-			ChatTools.formatAndSend(
-					"<option><yellow>Use \"/mail ?\" for command help.",
-					"Mail", player);
+			Mail.mail.sendPlayerMessage(player, Language.getInboxEmptyOther()
+					.replaceAll("%player", playername));
+			Mail.mail.sendPlayerMessage(player, Language.getMailErrorHelp());
 			return;
 		} else {
 			for (int i = 1; i <= result.size(); i++) {
@@ -99,8 +87,9 @@ public class MailSQL {
 				String message = result.get(i).get(3);
 				MailObject mail = new MailObject(id, index, sender, receiver,
 						message);
-				ChatTools.formatAndSend("<option>" + mail.toShortString(),
-						"Mail", player);
+				for (String s : mail.toShortString()) {
+					Mail.mail.sendPlayerMessage(player, s);
+				}
 			}
 		}
 	}
@@ -108,24 +97,26 @@ public class MailSQL {
 	public static void getSpecificMail(Player player, int id) {
 		MailObject tmpMail = getMail(player.getName(), id);
 		if (tmpMail == null) {
-			ChatTools
-					.formatAndSend("<option><gray>That message doesn't exist.",
-							"Mail", player);
+			Mail.mail.sendPlayerMessage(player,
+					Language.getMailErrorInvalidSelected());
+			return;
 		} else {
-			ChatTools.formatAndSend("<option>" + tmpMail.toLongString(),
-					"Mail", player);
+			for (String s : tmpMail.toLongString()) {
+				Mail.mail.sendPlayerMessage(player, s);
+			}
 		}
 	}
 
 	public static void getSpecificMail(Player player, String playername, int id) {
 		MailObject tmpMail = getMail(playername, id);
 		if (tmpMail == null) {
-			ChatTools
-					.formatAndSend("<option><gray>That message doesn't exist.",
-							"Mail", player);
+			Mail.mail.sendPlayerMessage(player,
+					Language.getMailErrorInvalidSelected());
+			return;
 		} else {
-			ChatTools.formatAndSend("<option>" + tmpMail.toLongString(),
-					"Mail", player);
+			for (String s : tmpMail.toLongString()) {
+				Mail.mail.sendPlayerMessage(player, s);
+			}
 		}
 	}
 
@@ -158,16 +149,18 @@ public class MailSQL {
 	public static void setClosedMail(Player player, int id) throws SQLException {
 		MailObject tmpMail = getMail(player.getName(), id);
 		if (tmpMail == null) {
-			ChatTools.formatAndSend("<option><red>That message doesn't exist.",
-					"Mail", player);
+			Mail.mail.sendPlayerMessage(player,
+					Language.getMailErrorInvalidSelected());
 			return;
 		}
 		String sql = "UPDATE " + Mail.database.tableName("mail")
 				+ " SET `read` = '1' WHERE id = '" + tmpMail.getId() + "';";
 		Mail.database.Write(sql);
-		ChatTools.formatAndSend("<option>Successfully deleted that message.",
-				"Mail", player);
-
+		for (String line : tmpMail.preformReplacement(Language
+				.getMailDeleteSingular().replaceAll("%messageNumber",
+						tmpMail.getIndex() + ""))) {
+			Mail.mail.sendPlayerMessage(player, line);
+		}
 	}
 
 	public static void setAllClosedMail(Player player) throws SQLException {
@@ -175,8 +168,7 @@ public class MailSQL {
 				+ " SET `read` = '1' WHERE `receiver` = '" + player.getName()
 				+ "';";
 		Mail.database.Write(sql);
-		ChatTools.formatAndSend("<option>Successfully deleted your mail.",
-				"Mail", player);
+		Mail.mail.sendPlayerMessage(player, Language.getMailDeletePlural());
 	}
 
 	public static void sendUnreadCount(String playername) {
@@ -185,21 +177,17 @@ public class MailSQL {
 			int unread = MailSQL.getUnreadCount(player.getName());
 			if (unread > 0)
 				if (unread == 1)
-					ChatTools
-							.formatAndSend(
-									("<option><white>You have <yellow>"
-											+ unread + "<white> unread message in your inbox."),
-									"Mail", player);
+					Mail.mail.sendPlayerMessage(
+							player,
+							Language.getInboxNewSingular().replaceAll(
+									"%numMessages", "" + unread));
 				else
-					ChatTools
-							.formatAndSend(
-									("<option><white>You have <yellow>"
-											+ unread + "<white> unread messages in your inbox."),
-									"Mail", player);
+					Mail.mail.sendPlayerMessage(
+							player,
+							Language.getInboxNewPlural().replaceAll(
+									"%numMessages", "" + unread));
 			else
-				ChatTools.formatAndSend(
-						("<option><gray>Nothing in your inbox."), "Mail",
-						player);
+				Mail.mail.sendPlayerMessage(player, Language.getInboxEmpty());
 		}
 	}
 }
