@@ -102,8 +102,8 @@ public class MailCommand implements CommandExecutor {
 			ArrayList<String> out = new ArrayList<String>();
 			out.add("&3-----[&bMail Information&3]-----");
 			out.add("&3#&0-&b###&0-");
-			out.add("&3&0--&b#&0--&b#    &3Developed by: &bvanZeben");
-			out.add("&3#&0-&b#&0--&b#");
+			out.add("&3&0--&b#&0--&b#    &3Developed by: &bvanZeben, ImDeity");
+			out.add("&3#&0-&b#&0--&b#    &3\'http://dev.bukkit.org/profiles/vanZeben\'");
 			out.add("&3#&0-&b#&0--&b#    &3\'The affordable courier.\'");
 			out.add("&3#&0-&b###&0-");
 			for (String s : out) {
