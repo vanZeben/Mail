@@ -5,15 +5,12 @@ import java.io.IOException;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.imdeity.mail.Mail;
-
 public class Language {
 
 	public static YamlConfiguration lang = new YamlConfiguration();
 
 	public void loadDefaults() {
-		lang = YamlConfiguration.loadConfiguration(new File(Mail.mail.getDataFolder().getPath() + "/language.yml"));
-
+		lang = YamlConfiguration.loadConfiguration(new File("plugins/Mail/language.yml"));
 		if (!lang.contains("header")) {
 			lang.set("header", "&7[&cMail&7] &f");
 		}
@@ -73,7 +70,7 @@ public class Language {
 
 	public void save() {
 		try {
-			lang.save(new File(Mail.mail.getDataFolder().getPath() + "/language.yml"));
+			lang.save(new File("plugins/Mail/language.yml"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

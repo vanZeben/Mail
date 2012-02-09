@@ -9,13 +9,9 @@ public class Settings {
 
 	private YamlConfiguration config = null;
 
-	public Settings() {
-		File tmpconfig = new File("plugins/MagicCarpet/config.yml");
-		config = YamlConfiguration.loadConfiguration(tmpconfig);
-		loadDefaults();
-	}
-
 	public void loadDefaults() {
+		File tmpconfig = new File("plugins/Mail/config.yml");
+		config = YamlConfiguration.loadConfiguration(tmpconfig);
 		if (!config.contains("mysql.server.address"))
 			config.set("mysql.server.address", "localhost");
 		if (!config.contains("mysql.server.port"))
