@@ -1,102 +1,65 @@
 package com.imdeity.mail;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.bukkit.util.config.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.imdeity.mail.util.FileMgmt;
-
-@SuppressWarnings("deprecation")
 public class Settings {
 
-	private static Configuration config;
-	private Mail plugin = null;
+	private YamlConfiguration config = null;
 
-	public Settings(Mail instance) {
-		this.plugin = instance;
+	public Settings() {
+		File tmpconfig = new File("plugins/MagicCarpet/config.yml");
+		config = YamlConfiguration.loadConfiguration(tmpconfig);
+		loadDefaults();
 	}
 
-	public boolean loadSettings(String name, String location) {
+	public void loadDefaults() {
+		if (!config.contains("mysql.server.address"))
+			config.set("mysql.server.address", "localhost");
+		if (!config.contains("mysql.server.port"))
+			config.set("mysql.server.port", 3306);
+		if (!config.contains("mysql.database.name"))
+			config.set("mysql.database.name", "kingdoms");
+		if (!config.contains("mysql.database.username"))
+			config.set("mysql.database.username", "root");
+		if (!config.contains("mysql.database.password"))
+			config.set("mysql.database.password", "root");
+		if (!config.contains("mysql.database.table_prefix"))
+			config.set("mysql.database.table_prefix", "mail_");
+		this.save();
+	}
+
+	public void save() {
 		try {
-			FileMgmt.checkFolders(new String[] { getRootFolder(),
-					getRootFolder() + FileMgmt.fileSeparator() + "" });
-			loadConfig(getRootFolder() + FileMgmt.fileSeparator() + name,
-					location);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			this.config.save(new File("plugins/Mail/config.yml"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		return true;
 	}
 
-	private static void loadConfig(String filepath, String defaultRes)
-			throws IOException {
-		File file = FileMgmt.CheckYMLexists(filepath, defaultRes);
-		if (file != null) {
-
-			// read the config.yml into memory
-			config = new Configuration(file);
-			config.load();
-			file = null;
-		}
+	public String getMySQLServerAddress() {
+		return config.getString("mysql.server.address");
 	}
 
-	private static Integer getInt(String root) {
-		return config.getInt(root.toLowerCase(), 0);
+	public int getMySQLServerPort() {
+		return config.getInt("mysql.server.port");
 	}
 
-	/*
-	 * Public Functions to read data from the Configuration and Language data
-	 */
-	private static String getString(String root) {
-		return config.getString(root.toLowerCase());
+	public String getMySQLDatabaseName() {
+		return config.getString("mysql.database.name");
 	}
 
-	/*
-	 * Sets a property and saves the Configuration
-	 */
-	public static void setProperty(String root, Object value) {
-		config.setProperty(root.toLowerCase(), value);
-		config.save();
+	public String getMySQLDatabaseUsername() {
+		return config.getString("mysql.database.username");
 	}
 
-	public String getRootFolder() {
-		if (this != null)
-			return plugin.getDataFolder().getPath();
-		else
-			return "";
+	public String getMySQLDatabasePassword() {
+		return config.getString("mysql.database.password");
 	}
 
-	// /////////////////////////////////
-
-	public static String getMySQLServerAddress() {
-		return getString("mysql.server.ADDRESS");
+	public String getMySQLDatabaseTablePrefix() {
+		return config.getString("mysql.database.table_prefix");
 	}
-
-	public static int getMySQLServerPort() {
-		return getInt("mysql.server.PORT");
-	}
-
-	public static String getMySQLUsername() {
-		return getString("mysql.server.USERNAME");
-	}
-
-	public static String getMySQLPassword() {
-		return getString("mysql.server.PASSWORD");
-	}
-
-	public static String getMySQLDatabaseName() {
-		return getString("mysql.database.NAME");
-	}
-
-	public static String getMySQLDatabaseTablePrefix() {
-		return getString("mysql.database.TABLE_PREFIX");
-	}
-
-	// //////////////////////
-
 }

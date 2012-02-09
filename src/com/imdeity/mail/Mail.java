@@ -20,7 +20,7 @@ public class Mail extends JavaPlugin {
 	public static Mail mail = null;
 	public static MySQLConnection database = null;
 	public static boolean hasError = false;
-	private Settings settings = null;
+	public Settings settings = null;
 	public Language language = null;
 
 	@Override
@@ -41,8 +41,7 @@ public class Mail extends JavaPlugin {
 			hasError = true;
 		}
 		if (!hasError) {
-			getServer().getPluginManager().registerEvents(
-					new MailPlayerListener(this), this);
+			getServer().getPluginManager().registerEvents(new MailPlayerListener(this), this);
 		}
 		out("Enabled");
 
@@ -53,12 +52,12 @@ public class Mail extends JavaPlugin {
 		this.settings = null;
 		this.language = new Language();
 		this.language.loadDefaults();
-		this.settings = new Settings(this);
-		this.settings.loadSettings("config.yml", "/config.yml");
+		this.settings = new Settings();
+		this.settings.loadDefaults();
 	}
 
 	public void setupDatabase() throws Exception {
-		database = new MySQLConnection();
+		database = new MySQLConnection(this);
 	}
 
 	public Player getPlayer(String playername) {
@@ -89,8 +88,7 @@ public class Mail extends JavaPlugin {
 		log.info("[" + pdfFile.getName() + "] " + message);
 	}
 
-	public static void sendMailToPlayer(String sender, String receiver,
-			String message) throws SQLException {
+	public static void sendMailToPlayer(String sender, String receiver, String message) throws SQLException {
 		MailSQL.sendMail(sender, receiver, message);
 	}
 

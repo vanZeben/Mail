@@ -9,29 +9,22 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.imdeity.mail.Settings;
+import com.imdeity.mail.Mail;
 
 public class MySQLConnection {
 
 	private Connection conn;
+	private Mail plugin = null;
 
-	public MySQLConnection() throws SQLException, InstantiationException,
-			IllegalAccessException, ClassNotFoundException {
+	public MySQLConnection(Mail instance) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+		plugin = instance;
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
 		connect();
 		createDatabaseTables();
 	}
 
 	public void createDatabaseTables() throws SQLException {
-		Write("CREATE TABLE IF NOT EXISTS " + tableName("mail") + " ("
-				+ "`id` INT(16) NOT NULL AUTO_INCREMENT ,"
-				+ "`sender` VARCHAR(16) NOT NULL ,"
-				+ "`receiver` VARCHAR(16) NOT NULL ,"
-				+ "`message` TEXT NOT NULL ,"
-				+ "`read` INT(1) NOT NULL DEFAULT '0',"
-				+ "`send_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
-				+ "PRIMARY KEY (`id`)," + "INDEX (`receiver`)"
-				+ ") ENGINE = MyISAM COMMENT = 'In Game Mail';");
+		Write("CREATE TABLE IF NOT EXISTS " + tableName("mail") + " (" + "`id` INT(16) NOT NULL AUTO_INCREMENT ," + "`sender` VARCHAR(16) NOT NULL ," + "`receiver` VARCHAR(16) NOT NULL ," + "`message` TEXT NOT NULL ," + "`read` INT(1) NOT NULL DEFAULT '0'," + "`send_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " + "PRIMARY KEY (`id`)," + "INDEX (`receiver`)" + ") ENGINE = MyISAM COMMENT = 'In Game Mail';");
 
 	}
 
@@ -41,8 +34,7 @@ public class MySQLConnection {
 		System.out.println("[Mail] Connection success!");
 	}
 
-	private PreparedStatement prepareSqlStatement(String sql, Object[] params)
-			throws SQLException {
+	private PreparedStatement prepareSqlStatement(String sql, Object[] params) throws SQLException {
 		PreparedStatement stmt = conn.prepareStatement(sql);
 
 		int counter = 1;
@@ -63,8 +55,7 @@ public class MySQLConnection {
 			} else if (param instanceof Object) {
 				stmt.setObject(counter++, (Object) param);
 			} else {
-				System.out.printf("Database -> Unsupported data type %s", param
-						.getClass().getSimpleName());
+				System.out.printf("Database -> Unsupported data type %s", param.getClass().getSimpleName());
 			}
 		}
 		return stmt;
@@ -91,16 +82,11 @@ public class MySQLConnection {
 	}
 
 	private String getConnectionString() {
-		return "jdbc:mysql://" + Settings.getMySQLServerAddress() + ":"
-				+ Settings.getMySQLServerPort() + "/"
-				+ Settings.getMySQLDatabaseName() + "?user="
-				+ Settings.getMySQLUsername() + "&password="
-				+ Settings.getMySQLPassword();
+		return "jdbc:mysql://" + plugin.settings.getMySQLServerAddress() + ":" + plugin.settings.getMySQLServerPort() + "/" + plugin.settings.getMySQLDatabaseName() + "?user=" + plugin.settings.getMySQLDatabaseUsername() + "&password=" + plugin.settings.getMySQLDatabasePassword();
 	}
 
 	public String tableName(String nameOfTable) {
-		return (String.format("`%s`.`%s`", Settings.getMySQLDatabaseName(),
-				Settings.getMySQLDatabaseTablePrefix() + nameOfTable));
+		return (String.format("`%s`.`%s`", plugin.settings.getMySQLDatabaseName(), plugin.settings.getMySQLDatabaseTablePrefix() + nameOfTable));
 	}
 
 	private void dumpSqlException(SQLException ex) {
@@ -159,8 +145,7 @@ public class MySQLConnection {
 	}
 
 	// read query
-	public HashMap<Integer, ArrayList<Object>> Read2(String sql,
-			Object... params) {
+	public HashMap<Integer, ArrayList<Object>> Read2(String sql, Object... params) {
 
 		/*
 		 * Double check connection to MySQL
@@ -215,8 +200,7 @@ public class MySQLConnection {
 	}
 
 	// read query
-	public HashMap<Integer, ArrayList<String>> Read(String sql,
-			Object... params) {
+	public HashMap<Integer, ArrayList<String>> Read(String sql, Object... params) {
 
 		/*
 		 * Double check connection to MySQL
