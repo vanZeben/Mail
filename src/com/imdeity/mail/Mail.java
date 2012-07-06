@@ -50,7 +50,7 @@ public class Mail extends JavaPlugin {
 	public void reloadConfigs() {
 		this.language = null;
 		this.settings = null;
-		this.language = new Language();
+		this.language = new Language(this);
 		this.language.loadDefaults();
 		this.settings = new Settings(this);
 		this.settings.loadDefaults();
