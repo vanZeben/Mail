@@ -52,7 +52,7 @@ public class Mail extends JavaPlugin {
 		this.settings = null;
 		this.language = new Language();
 		this.language.loadDefaults();
-		this.settings = new Settings();
+		this.settings = new Settings(this);
 		this.settings.loadDefaults();
 	}
 
