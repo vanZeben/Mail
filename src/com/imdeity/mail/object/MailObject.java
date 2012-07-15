@@ -2,6 +2,7 @@ package com.imdeity.mail.object;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Matcher;
 
 import com.imdeity.mail.util.HumanTime;
 import com.imdeity.mail.util.StringMgmt;
@@ -75,11 +76,11 @@ public class MailObject {
 		msg = msg
 				.replaceAll("%messageId", this.getId() + "")
 				.replaceAll("%messageLocalIndex", this.getIndex() + "")
-				.replaceAll("%messageSender", this.getSender())
-				.replaceAll("%messageLongMessage", this.message)
+				.replaceAll("%messageSender", Matcher.quoteReplacement(this.getSender()))
+				.replaceAll("%messageLongMessage", Matcher.quoteReplacement(this.message))
 				.replaceAll("%messageShortMessage",
-						StringMgmt.maxLength(this.message, 30))
-				.replaceAll("%messageReceiver", this.getReceiver())
+						Matcher.quoteReplacement(StringMgmt.maxLength(this.message, 30)))
+				.replaceAll("%messageReceiver", Matcher.quoteReplacement(this.getReceiver()))
 				.replaceAll("%messageSendDate", this.getSendDate());
 
 		String[] tmpMsg = msg.split("%newline");
