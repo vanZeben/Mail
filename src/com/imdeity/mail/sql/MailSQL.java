@@ -130,8 +130,8 @@ public class MailSQL {
 				+ player
 				+ "' AND `read` = '0';";
 		HashMap<Integer, ArrayList<Object>> result = Mail.database.Read2(sql);
-		if (result != null && !result.isEmpty() && result.size() >= offset) {
-			int index = Integer.parseInt("" + result.get(offset).get(0));
+		if (result != null && !result.isEmpty() && result.size() >= offset && result.get(offset) != null) {
+			int index = Integer.parseInt("" + (result.get(offset).get(0) == null ? "1" : result.get(offset).get(0)));
 			int id = Integer.parseInt("" + result.get(offset).get(1));
 			String sender = "" + result.get(offset).get(2);
 			String receiver = player;
