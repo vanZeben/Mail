@@ -18,7 +18,7 @@ public class MailPlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void playerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		if (player.hasPermission("mail.player.join")) {
+		if (player != null && player.isOnline() && player.hasPermission("mail.player.join")) {
 			MailSQL.sendUnreadCount(player.getName());
 		}
 	}
