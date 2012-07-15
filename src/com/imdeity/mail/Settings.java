@@ -4,13 +4,19 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 
 public class Settings {
 
 	private YamlConfiguration config = null;
+	private Plugin plugin;
+
+	public Settings(Mail mail) {
+		plugin = mail;
+	}
 
 	public void loadDefaults() {
-		File tmpconfig = new File("plugins/Mail/config.yml");
+		File tmpconfig = new File(plugin.getDataFolder(), "config.yml");
 		config = YamlConfiguration.loadConfiguration(tmpconfig);
 		if (!config.contains("mysql.server.address"))
 			config.set("mysql.server.address", "localhost");
@@ -29,7 +35,7 @@ public class Settings {
 
 	public void save() {
 		try {
-			this.config.save(new File("plugins/Mail/config.yml"));
+			this.config.save(new File(plugin.getDataFolder(),"config.yml"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
