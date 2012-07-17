@@ -1,8 +1,8 @@
 name: Mail
-main: com.imdeity.mail.Mail
-version: 1.3
+main: com.imdeity.mail.MailMain
+version: 17.7.12
 authors: [vanZeben, ImDeity]
 commands:
-  mail:
+  Mail:
     aliases: [m]
     
