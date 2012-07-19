@@ -18,4 +18,6 @@ public class MailLanguageHelper {
     public static final String MAIL_CONVERT_SUCCESS = "mail.convert.success";
     public static final String MAIL_ERROR_INVALID_MAIL = "mail.error.invalid_selected";
     public static final String MAIL_ERROR_INVALID_LENGTH = "mail.error.not_long_enough";
+    public static final String MAIL_ERROR_INVALID_FUNDS = "mail.error.invalid_funds";
+    public static final String MAIL_ERROR_CLOSE_MATCH = "mail.error.close_match";
 }

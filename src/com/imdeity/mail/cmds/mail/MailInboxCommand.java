@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.bukkit.entity.Player;
 
+import com.imdeity.deityapi.DeityAPI;
 import com.imdeity.deityapi.api.DeityCommandReceiver;
+import com.imdeity.deityapi.exception.NegativeMoneyException;
+import com.imdeity.mail.MailConfigHelper;
 import com.imdeity.mail.MailLanguageHelper;
 import com.imdeity.mail.MailMain;
 import com.imdeity.mail.object.Mail;
@@ -29,6 +33,11 @@ public class MailInboxCommand extends DeityCommandReceiver {
         MailPlayer mPlayer = MailManager.getMailPlayer(player.getName());
         List<String[]> output = new ArrayList<String[]>();
         MailType type = null;
+        double cost = MailMain.plugin.config.getDouble(MailConfigHelper.MAIL_COST_INBOX);
+        if (!DeityAPI.getAPI().getEconAPI().canPay(player.getName(), cost)) {
+            MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_FUNDS).replaceAll("%cost", Matcher.quoteReplacement(cost + "")));
+            return true;
+        }
         if (args.length < 1) {
             if (mPlayer.getUnreadMail() == null) {
                 MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_INBOX_EMPTY_GENERAL));
@@ -48,6 +57,14 @@ public class MailInboxCommand extends DeityCommandReceiver {
             for (int i = 0; i < mPlayer.getAllMail(type).size(); i++) {
                 Mail m = mPlayer.getAllMail(type).get(i);
                 output.add(m.toShortString(i + 1));
+            }
+        }
+        if (cost > 0) {
+            try {
+                DeityAPI.getAPI().getEconAPI().send(player.getName(), cost, "Mail - Inbox");
+            } catch (NegativeMoneyException e) {
+                e.printStackTrace();
+                return true;
             }
         }
         if (output != null && output.size() > 0) {

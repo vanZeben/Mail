@@ -1,6 +1,6 @@
 name: Mail
 main: com.imdeity.mail.MailMain
-version: 12.07.17
+version: 12.07.19
 authors: [vanZeben, ImDeity]
 commands:
   Mail:

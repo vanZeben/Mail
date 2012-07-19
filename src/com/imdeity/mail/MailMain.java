@@ -20,7 +20,10 @@ public class MailMain extends DeityPlugin {
     
     @Override
     protected void initConfig() {
-        // No config needed
+        this.config.addDefaultConfigValue(MailConfigHelper.MAIL_COST_INBOX, 0.0);
+        this.config.addDefaultConfigValue(MailConfigHelper.MAIL_COST_READ, 0.0);
+        this.config.addDefaultConfigValue(MailConfigHelper.MAIL_COST_WRITE, 0.0);
+        this.config.addDefaultConfigValue(MailConfigHelper.MAIL_CLOSE_MATCH, 5);
     }
     
     @Override
@@ -39,6 +42,8 @@ public class MailMain extends DeityPlugin {
         this.language.addDefaultLanguageValue(MailLanguageHelper.MAIL_CONVERT_SUCCESS, "Converted the old data and reloaded the plugin");
         this.language.addDefaultLanguageValue(MailLanguageHelper.MAIL_ERROR_INVALID_MAIL, "&cThat message doesn't exist.");
         this.language.addDefaultLanguageValue(MailLanguageHelper.MAIL_ERROR_INVALID_LENGTH, "&cYour message has to be longer then &4%messageLength words");
+        this.language.addDefaultLanguageValue(MailLanguageHelper.MAIL_ERROR_INVALID_FUNDS, "&cYou do not have enough money for this action");
+        this.language.addDefaultLanguageValue(MailLanguageHelper.MAIL_ERROR_CLOSE_MATCH, "&cYou have already sent a message close to this one to that player");
     }
     
     @Override
