@@ -15,11 +15,11 @@ public class MailCommandHandler extends DeityCommandHandler {
     
     @Override
     protected void initRegisteredCommands() {
-        this.registerCommand("reload", "", "Reloads the config and all mail", new MailReloadCommand(), "Mail.admin");
-        this.registerCommand("convert", "<old-table-name>", "Converts the old mail data to the new format", new MailConvertCommand(), "Mail.admin");
-        this.registerCommand("inbox", "<read/unread>", "Checks your inbox", new MailInboxCommand(), "Mail.general");
-        this.registerCommand("read", "[index]", "Opens the specified mail", new MailReadCommand(), "Mail.general");
-        this.registerCommand("write", "[receiver] [message]", "Sends a new mail", new MailWriteCommand(), "Mail.general");
+        this.registerCommand("reload", "", "Reloads the config and all mail", new MailReloadCommand(), "Mail.admin.reload");
+        this.registerCommand("convert", "<old-table-name>", "Converts the old mail data to the new format", new MailConvertCommand(), "Mail.admin.convert");
+        this.registerCommand("inbox", "<read/unread>", "Checks your inbox", new MailInboxCommand(), "Mail.general.inbox");
+        this.registerCommand("read", "[index]", "Opens the specified mail", new MailReadCommand(), "Mail.general.read");
+        this.registerCommand("write", "[receiver] [message]", "Sends a new mail", new MailWriteCommand(), "Mail.general.write");
     }
     
 }
