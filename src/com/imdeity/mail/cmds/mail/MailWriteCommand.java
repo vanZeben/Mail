@@ -24,15 +24,19 @@ public class MailWriteCommand extends DeityCommandReceiver {
     public boolean onPlayerRunCommand(Player player, String[] args) {
         if (args.length < 1) { return false; }
         double cost = MailMain.plugin.config.getDouble(MailConfigHelper.MAIL_COST_WRITE);
-        if (!DeityAPI.getAPI().getEconAPI().canPay(player.getName(), cost)) {
-            MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_FUNDS).replaceAll("%cost", Matcher.quoteReplacement(cost + "")));
+        if (cost > 0 && DeityAPI.getAPI().isEconAPIOnline() && !DeityAPI.getAPI().getEconAPI().canPay(player.getName(), cost)) {
+            MailMain.plugin.chat.sendPlayerMessage(
+                    player,
+                    MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_FUNDS).replaceAll("%cost",
+                            Matcher.quoteReplacement(cost + "")));
             return true;
         }
         String sender = player.getName();
         String receiver = args[0];
         args = DeityAPI.getAPI().getUtilAPI().getStringUtils().remFirstArg(args);
         if (args.length < 3) {
-            MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_LENGTH).replaceAll("%messageLength", "3"));
+            MailMain.plugin.chat.sendPlayerMessage(player,
+                    MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_LENGTH).replaceAll("%messageLength", "3"));
             return true;
         }
         String message = DeityAPI.getAPI().getUtilAPI().getStringUtils().join(args, " ");
@@ -60,19 +64,24 @@ public class MailWriteCommand extends DeityCommandReceiver {
         
         public void run() {
             if (MailManager.containsCloseMessage(player.getName(), receiver, message)) {
-                MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_CLOSE_MATCH));
+                MailMain.plugin.chat.sendPlayerMessage(player,
+                        MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_CLOSE_MATCH));
                 return;
             }
             mPlayer.sendMail(receiver, message);
-            if (cost > 0) {
+            if (cost > 0 && DeityAPI.getAPI().isEconAPIOnline()) {
                 try {
                     DeityAPI.getAPI().getEconAPI().send(player.getName(), cost, "Mail - Write");
                 } catch (NegativeMoneyException e) {
                     e.printStackTrace();
                 }
             }
-            MailMain.plugin.chat.sendPlayerMessage(player,
-                    MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_SENT).replaceAll("%messageReceiver", Matcher.quoteReplacement(receiver)).replaceAll("%messageMessage", Matcher.quoteReplacement(message)).replaceAll("%cost", Matcher.quoteReplacement(cost + "")));
+            MailMain.plugin.chat.sendPlayerMessage(
+                    player,
+                    MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_SENT)
+                            .replaceAll("%messageReceiver", Matcher.quoteReplacement(receiver))
+                            .replaceAll("%messageMessage", Matcher.quoteReplacement(message))
+                            .replaceAll("%cost", Matcher.quoteReplacement(cost + "")));
         }
     }
 }

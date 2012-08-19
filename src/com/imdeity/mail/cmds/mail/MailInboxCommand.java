@@ -34,13 +34,17 @@ public class MailInboxCommand extends DeityCommandReceiver {
         List<String[]> output = new ArrayList<String[]>();
         MailType type = null;
         double cost = MailMain.plugin.config.getDouble(MailConfigHelper.MAIL_COST_INBOX);
-        if (!DeityAPI.getAPI().getEconAPI().canPay(player.getName(), cost)) {
-            MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_FUNDS).replaceAll("%cost", Matcher.quoteReplacement(cost + "")));
+        if (cost > 0 && DeityAPI.getAPI().isEconAPIOnline() && !DeityAPI.getAPI().getEconAPI().canPay(player.getName(), cost)) {
+            MailMain.plugin.chat.sendPlayerMessage(
+                    player,
+                    MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_FUNDS).replaceAll("%cost",
+                            Matcher.quoteReplacement(cost + "")));
             return true;
         }
         if (args.length < 1) {
             if (mPlayer.getUnreadMail() == null) {
-                MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_INBOX_EMPTY_GENERAL));
+                MailMain.plugin.chat.sendPlayerMessage(player,
+                        MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_INBOX_EMPTY_GENERAL));
                 return true;
             }
             for (int i = 0; i < mPlayer.getUnreadMail().size(); i++) {
@@ -51,7 +55,8 @@ public class MailInboxCommand extends DeityCommandReceiver {
             type = MailType.getFromString(args[0]);
             if (type == null) { return false; }
             if (mPlayer.getAllMail(type) == null) {
-                MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_INBOX_EMPTY_GENERAL));
+                MailMain.plugin.chat.sendPlayerMessage(player,
+                        MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_INBOX_EMPTY_GENERAL));
                 return true;
             }
             for (int i = 0; i < mPlayer.getAllMail(type).size(); i++) {
@@ -59,7 +64,7 @@ public class MailInboxCommand extends DeityCommandReceiver {
                 output.add(m.toShortString(i + 1));
             }
         }
-        if (cost > 0) {
+        if (cost > 0 && DeityAPI.getAPI().isEconAPIOnline()) {
             try {
                 DeityAPI.getAPI().getEconAPI().send(player.getName(), cost, "Mail - Inbox");
             } catch (NegativeMoneyException e) {
@@ -70,9 +75,11 @@ public class MailInboxCommand extends DeityCommandReceiver {
         if (output != null && output.size() > 0) {
             lastInboxMailType.put(player.getName().toLowerCase(), type);
             if (type == MailType.READ) {
-                MailMain.plugin.chat.sendPlayerMessageNoHeader(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_MESSAGE_HEADER_READ));
+                MailMain.plugin.chat.sendPlayerMessageNoHeader(player,
+                        MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_MESSAGE_HEADER_READ));
             } else {
-                MailMain.plugin.chat.sendPlayerMessageNoHeader(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_MESSAGE_HEADER_UNREAD));
+                MailMain.plugin.chat.sendPlayerMessageNoHeader(player,
+                        MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_MESSAGE_HEADER_UNREAD));
             }
             for (String[] sOutput : output) {
                 for (String s : sOutput) {
@@ -80,7 +87,8 @@ public class MailInboxCommand extends DeityCommandReceiver {
                 }
             }
         } else {
-            MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_INBOX_EMPTY_GENERAL));
+            MailMain.plugin.chat.sendPlayerMessage(player,
+                    MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_INBOX_EMPTY_GENERAL));
             return true;
         }
         return true;

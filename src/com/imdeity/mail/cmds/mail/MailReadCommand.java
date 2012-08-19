@@ -30,8 +30,11 @@ public class MailReadCommand extends DeityCommandReceiver {
         List<String[]> output = new ArrayList<String[]>();
         if (args.length < 1) { return false; }
         double cost = MailMain.plugin.config.getDouble(MailConfigHelper.MAIL_COST_READ);
-        if (!DeityAPI.getAPI().getEconAPI().canPay(player.getName(), cost)) {
-            MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_FUNDS).replaceAll("%cost", Matcher.quoteReplacement(cost + "")));
+        if (cost > 0 && DeityAPI.getAPI().isEconAPIOnline() && !DeityAPI.getAPI().getEconAPI().canPay(player.getName(), cost)) {
+            MailMain.plugin.chat.sendPlayerMessage(
+                    player,
+                    MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_FUNDS).replaceAll("%cost",
+                            Matcher.quoteReplacement(cost + "")));
             return true;
         }
         int shownIndex = 0;
@@ -50,14 +53,15 @@ public class MailReadCommand extends DeityCommandReceiver {
             lastType = MailType.UNREAD;
         }
         if (actualIndex >= mPlayer.getAllMail(lastType).size()) {
-            MailMain.plugin.chat.sendPlayerMessage(player, MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_MAIL));
+            MailMain.plugin.chat.sendPlayerMessage(player,
+                    MailMain.plugin.language.getNode(MailLanguageHelper.MAIL_ERROR_INVALID_MAIL));
             return true;
         }
         Mail mail = mPlayer.getAllMail(lastType).get(actualIndex);
         if (lastType == MailType.UNREAD) {
             mPlayer.setMailType(mail.getId(), MailType.READ);
         }
-        if (cost > 0) {
+        if (cost > 0 && DeityAPI.getAPI().isEconAPIOnline()) {
             try {
                 DeityAPI.getAPI().getEconAPI().send(player.getName(), cost, "Mail - Read");
             } catch (NegativeMoneyException e) {
